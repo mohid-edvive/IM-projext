@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ──────────────────────────────────────────────────────────────────
+   Investigo Design System
+   Palette: Ink #12261F · Paper #F5F2EA · Amber #C8852C
+   Typography: Instrument Serif (display) · Geist (UI) · Geist Mono (numbers)
+   ────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  :root {
+    /* Paper / surface */
+    --background: 44 33% 94%;          /* #F5F2EA paper */
+    --foreground: 156 35% 11%;         /* #12261F ink */
+
+    --card: 44 30% 90%;                /* #ede8db paper-alt */
+    --card-foreground: 156 35% 11%;
+
+    --popover: 44 33% 94%;
+    --popover-foreground: 156 35% 11%;
+
+    /* Primary = Ink */
+    --primary: 156 35% 11%;
+    --primary-foreground: 44 33% 94%;
+
+    /* Secondary / muted = paper-alt */
+    --secondary: 44 30% 90%;
+    --secondary-foreground: 156 35% 11%;
+
+    --muted: 44 30% 90%;
+    --muted-foreground: 47 7% 51%;     /* #8a8778 mute */
+
+    /* Accent = Amber */
+    --accent: 32 65% 48%;              /* #C8852C amber */
+    --accent-foreground: 44 33% 94%;
+
+    --destructive: 0 65% 42%;
+    --destructive-foreground: 44 33% 94%;
+
+    /* Market signals — keep semantic green/red but warmer */
+    --gain: 156 50% 22%;               /* deep ink-green for gains */
+    --gain-foreground: 44 33% 94%;
+    --loss: 12 65% 42%;                /* warm rust for losses */
+    --loss-foreground: 44 33% 94%;
+
+    /* Brand-specific tokens */
+    --ink: 156 35% 11%;
+    --ink-soft: 156 35% 16%;
+    --paper: 44 33% 94%;
+    --paper-alt: 44 30% 90%;
+    --amber: 32 65% 48%;
+    --amber-soft: 32 70% 68%;
+
+    --border: 156 20% 80%;             /* soft ink-tinted line */
+    --input: 156 20% 80%;
+    --ring: 32 65% 48%;                /* amber focus ring */
+
+    --radius: 0.125rem;
+
+    --sidebar-background: 44 33% 94%;
+    --sidebar-foreground: 156 35% 11%;
+    --sidebar-primary: 156 35% 11%;
+    --sidebar-primary-foreground: 44 33% 94%;
+    --sidebar-accent: 44 30% 90%;
+    --sidebar-accent-foreground: 156 35% 11%;
+    --sidebar-border: 156 20% 80%;
+    --sidebar-ring: 32 65% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Geist', -apple-system, system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Instrument Serif', 'Times New Roman', serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  /* Selection in amber */
+  ::selection {
+    background: hsl(var(--amber) / 0.25);
+    color: hsl(var(--ink));
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply border border-border bg-card;
+    border-radius: 2px;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-colors hover:bg-muted;
+  }
+
+  .glow-text {
+    @apply text-foreground font-semibold;
+  }
+
+  .number-display {
+    font-family: 'Geist Mono', 'SF Mono', 'Consolas', monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  .gradient-primary {
+    @apply bg-primary;
+  }
+
+  .gradient-text {
+    @apply text-foreground font-bold;
+  }
+
+  .font-serif {
+    font-family: 'Instrument Serif', 'Times New Roman', serif;
+    font-weight: 400;
+  }
+
+  .font-serif-italic {
+    font-family: 'Instrument Serif', 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+}
