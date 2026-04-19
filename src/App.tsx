@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import Index from "./pages/Index";
 import Learn from "./pages/Learn";
 import Lesson from "./pages/Lesson";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/analysis" element={<Analysis />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <Footer />
         </div>
       </BrowserRouter>
     </TooltipProvider>

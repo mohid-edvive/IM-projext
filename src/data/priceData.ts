@@ -170,6 +170,53 @@ export function generatePriceHistory(ticker: string): PricePoint[] {
   return prices;
 }
 
+// ── OHLC (Open / High / Low / Close) generator ──────────────────────────────
+
+export interface OHLCPoint {
+  date: string; // YYYY-MM
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
+
+const ohlcCache: Record<string, OHLCPoint[]> = {};
+
+/**
+ * Derive monthly OHLC candlestick data from the close-price history.
+ * - open  = previous month's close (first month: synthetic open near close)
+ * - close = the synthetic monthly closing price
+ * - high  = max(open, close) + seeded wick extension
+ * - low   = min(open, close) − seeded wick extension
+ */
+export function generateOHLCHistory(ticker: string): OHLCPoint[] {
+  if (ohlcCache[ticker]) return ohlcCache[ticker];
+
+  const closes = generatePriceHistory(ticker);
+  const profile = profiles[ticker] ?? defaultProfile;
+  // Separate seeded RNG so OHLC is deterministic and independent
+  const rng = seededRandom(hashString(ticker + '_ohlc'));
+
+  const result: OHLCPoint[] = closes.map((p, i) => {
+    const close = p.price;
+    const open  = i === 0
+      ? close * (1 - (rng() - 0.5) * profile.volatility * 0.6)
+      : closes[i - 1].price;
+
+    const bodyHigh  = Math.max(open, close);
+    const bodyLow   = Math.min(open, close);
+    // Wick length is proportional to intra-month volatility (seeded)
+    const wiggle    = Math.max(bodyHigh * profile.volatility * 0.25, bodyHigh * 0.003);
+    const high      = bodyHigh + wiggle * (0.4 + rng() * 0.8);
+    const low       = Math.max(0.0001, bodyLow - wiggle * (0.4 + rng() * 0.8));
+
+    return { date: p.date, open, high, low, close };
+  });
+
+  ohlcCache[ticker] = result;
+  return result;
+}
+
 export function getPriceAtDate(ticker: string, date: string): number {
   const history = generatePriceHistory(ticker);
   const point = history.find(p => p.date === date);
