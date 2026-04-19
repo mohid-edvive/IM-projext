@@ -24,7 +24,7 @@ export default function Footer() {
     >
       {/* ── Main grid ────────────────────────────────────────────────────── */}
       <div className="container mx-auto max-w-5xl px-6 md:px-8 pt-14 pb-10">
-        <div className="grid gap-12 md:grid-cols-[1fr_auto_auto]">
+        <div className="grid gap-12 md:grid-cols-[1fr_auto]">
 
           {/* ── Column 1: Brand ─────────────────────────────────────────── */}
           <div>
@@ -127,65 +127,6 @@ export default function Footer() {
             </nav>
           </div>
 
-          {/* ── Column 3: Design system tokens ──────────────────────────── */}
-          <div className="min-w-[120px]">
-            <p
-              className="font-mono uppercase tracking-[0.2em] mb-5"
-              style={{ fontSize: 8, color: "hsl(var(--paper) / 0.35)" }}
-            >
-              Design
-            </p>
-            <div className="space-y-3">
-              {[
-                { swatch: "hsl(var(--ink))",   border: "hsl(var(--paper)/0.2)", label: "Ink" },
-                { swatch: "hsl(var(--paper))",  border: "hsl(var(--paper)/0.2)", label: "Paper" },
-                { swatch: "hsl(var(--amber))",  border: "transparent",           label: "Amber" },
-                { swatch: "hsl(var(--gain))",   border: "transparent",           label: "Gain" },
-                { swatch: "hsl(var(--loss))",   border: "transparent",           label: "Loss" },
-              ].map(({ swatch, border, label }) => (
-                <div key={label} className="flex items-center gap-2">
-                  <span
-                    className="h-3 w-3 shrink-0 border"
-                    style={{ backgroundColor: swatch, borderColor: border, borderRadius: 1 }}
-                  />
-                  <span
-                    className="font-mono"
-                    style={{ fontSize: 10, color: "hsl(var(--paper) / 0.45)" }}
-                  >
-                    {label}
-                  </span>
-                </div>
-              ))}
-
-              {/* Typography */}
-              <div className="mt-4 pt-4" style={{ borderTop: "1px solid hsl(var(--paper)/0.08)" }}>
-                {[
-                  { font: "Instrument Serif",  role: "Display",  italic: true  },
-                  { font: "Geist",             role: "UI",       italic: false },
-                  { font: "Geist Mono",        role: "Numbers",  italic: false },
-                ].map(({ font, role, italic }) => (
-                  <div key={font} className="mb-2">
-                    <span
-                      style={{
-                        fontFamily: italic ? "Instrument Serif, serif" : font,
-                        fontStyle: italic ? "italic" : "normal",
-                        fontSize: 11,
-                        color: "hsl(var(--paper) / 0.55)",
-                      }}
-                    >
-                      {role}
-                    </span>
-                    <span
-                      className="font-mono block"
-                      style={{ fontSize: 8, color: "hsl(var(--paper) / 0.28)" }}
-                    >
-                      {font}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
