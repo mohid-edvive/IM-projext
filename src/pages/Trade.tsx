@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useGameStore } from "@/store/gameStore";
 import { assets } from "@/data/assets";
@@ -17,12 +17,25 @@ import TradeNewsWidget from "@/components/trade/TradeNewsWidget";
 import AnalysisTab from "@/components/trade/AnalysisTab";
 
 export default function Trade() {
-  const walletBalance = useGameStore((s) => s.walletBalance);
-  const totalEarned = useGameStore((s) => s.totalEarned);
-  const unlockedAssets = useGameStore((s) => s.unlockedAssets);
+  const walletBalance   = useGameStore((s) => s.walletBalance);
+  const totalEarned     = useGameStore((s) => s.totalEarned);
+  const unlockedAssets  = useGameStore((s) => s.unlockedAssets);
+  const startClock      = useGameStore((s) => s.startClock);
+  const syncCurrentDate = useGameStore((s) => s.syncCurrentDate);
 
   const [selectedAsset, setSelectedAsset] = useState<string>("SPY");
   const [bottomTab, setBottomTab] = useState<"holdings" | "history" | "analysis">("holdings");
+
+  // Start the real-time simulation clock as soon as the user has earned capital.
+  // syncCurrentDate is called here as a backup; the TimelineController drives
+  // the per-second sync once it mounts.
+  useEffect(() => {
+    if (totalEarned > 0) {
+      startClock();
+      syncCurrentDate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalEarned]);
 
   if (walletBalance === 0 && totalEarned === 0) {
     return (

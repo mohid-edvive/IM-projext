@@ -1,16 +1,11 @@
-import { useState, useRef, useCallback, useMemo } from "react";
-import { useGameStore } from "@/store/gameStore";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronsRight, Play, Pause, SkipBack, Newspaper, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useGameStore, dateToIndex, indexToDate, MONTHS_TOTAL, MS_PER_GAME_MONTH } from "@/store/gameStore";
+import { Newspaper, MapPin, Clock, CheckCircle2, Lock } from "lucide-react";
 
-const months = Array.from({ length: 84 }, (_, i) => {
-  const year = 2020 + Math.floor(i / 12);
-  const month = (i % 12) + 1;
-  return `${year}-${String(month).padStart(2, "0")}`;
-});
+// ── Static data ──────────────────────────────────────────────────────────────
 
+const months = Array.from({ length: MONTHS_TOTAL }, (_, i) => indexToDate(i));
 const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026];
-
 const monthNames = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
 
 interface NewsItem {
@@ -134,237 +129,268 @@ const newsData: Record<string, NewsItem[]> = {
 const events: Record<string, string> = {
   "2020-03": "COVID Crash",
   "2020-11": "Vaccine Rally",
-  "2021-01": "GameStop Squeeze",
+  "2021-01": "GameStop",
   "2021-11": "Crypto Peak",
-  "2022-01": "Fed Rate Hikes",
+  "2022-01": "Rate Hikes",
   "2022-06": "Bear Market",
   "2022-11": "FTX Collapse",
-  "2023-03": "SVB Bank Crisis",
+  "2023-03": "SVB Crisis",
   "2023-10": "AI Boom",
-  "2024-03": "Bitcoin Halving",
+  "2024-03": "BTC Halving",
   "2025-01": "New Era",
 };
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function pad(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+function formatSimDate(date: string) {
+  const [yr, mo] = date.split("-").map(Number);
+  const names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${names[mo - 1]} ${yr}`;
+}
+
+// ── Component ────────────────────────────────────────────────────────────────
+
 export default function TimelineController() {
-  const currentDate = useGameStore((s) => s.currentDate);
-  const setCurrentDate = useGameStore((s) => s.setCurrentDate);
-  const dateIndex = months.indexOf(currentDate);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(2000);
-  const playRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
+  const currentDate     = useGameStore((s) => s.currentDate);
+  const clockStartedAt  = useGameStore((s) => s.clockStartedAt);
+  const syncCurrentDate = useGameStore((s) => s.syncCurrentDate);
 
-  const moveDate = useCallback((delta: number) => {
-    const newIdx = Math.max(0, Math.min(months.length - 1, dateIndex + delta));
-    setCurrentDate(months[newIdx]);
-  }, [dateIndex, setCurrentDate]);
+  // Tick every second to re-render the countdown + trigger date sync
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    syncCurrentDate();
+    const id = setInterval(() => {
+      syncCurrentDate();
+      setTick((t) => t + 1);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [syncCurrentDate]);
 
-  const startPlay = useCallback((spd: number) => {
-    if (playRef.current) clearInterval(playRef.current);
-    setIsPlaying(true);
-    setSpeed(spd);
-    playRef.current = setInterval(() => {
-      const store = useGameStore.getState();
-      const idx = months.indexOf(store.currentDate);
-      if (idx >= months.length - 1) {
-        if (playRef.current) clearInterval(playRef.current);
-        setIsPlaying(false);
-        return;
-      }
-      store.setCurrentDate(months[idx + 1]);
-    }, spd);
-  }, []);
-
-  const togglePlay = useCallback(() => {
-    if (isPlaying) {
-      if (playRef.current) clearInterval(playRef.current);
-      playRef.current = null;
-      setIsPlaying(false);
-    } else {
-      startPlay(speed);
-    }
-  }, [isPlaying, speed, startPlay]);
-
-  const handleTrackClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!trackRef.current) return;
-    const rect = trackRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const pct = Math.max(0, Math.min(1, x / rect.width));
-    const idx = Math.round(pct * (months.length - 1));
-    setCurrentDate(months[idx]);
-  }, [setCurrentDate]);
-
+  const dateIndex   = dateToIndex(currentDate);
+  const progressPct = (dateIndex / (MONTHS_TOTAL - 1)) * 100;
+  const isComplete  = dateIndex >= MONTHS_TOTAL - 1;
   const currentYear = parseInt(currentDate.split("-")[0]);
 
+  // Live countdown — recomputed every render tick
+  let countdown: { h: number; m: number; s: number } | null = null;
+  if (clockStartedAt && !isComplete) {
+    const elapsed          = Date.now() - clockStartedAt;
+    const msIntoMonth      = elapsed % MS_PER_GAME_MONTH;
+    const msUntilNext      = MS_PER_GAME_MONTH - msIntoMonth;
+    countdown = {
+      h: Math.floor(msUntilNext / 3_600_000),
+      m: Math.floor((msUntilNext % 3_600_000) / 60_000),
+      s: Math.floor((msUntilNext % 60_000) / 1_000),
+    };
+  }
+
   const currentEvent = events[currentDate];
-  const currentNews = newsData[currentDate] || [];
-
-  const eventPositions = useMemo(() => {
-    return Object.entries(events).map(([date, label]) => {
-      const idx = months.indexOf(date);
-      if (idx === -1) return null;
-      const pct = (idx / (months.length - 1)) * 100;
-      return { date, label, pct };
-    }).filter(Boolean) as { date: string; label: string; pct: number }[];
-  }, []);
-
-  const progressPct = (dateIndex / (months.length - 1)) * 100;
-
-  const speeds = [
-    { label: "0.5×", ms: 4000 },
-    { label: "1×", ms: 2000 },
-    { label: "2×", ms: 1000 },
-  ];
+  const currentNews  = newsData[currentDate] || [];
 
   return (
     <div className="border border-border">
-      {/* Top row: controls + date display */}
-      <div className="flex items-center gap-1 px-2 py-1.5 border-b border-border">
-        <span className="text-[8px] uppercase tracking-widest text-muted-foreground font-medium shrink-0 mr-1">TIMELINE</span>
-        
-        <Button variant="ghost" size="icon" onClick={() => { setCurrentDate(months[0]); }} className="shrink-0 h-5 w-5" title="Reset to start">
-          <SkipBack className="h-3 w-3" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => moveDate(-1)} className="shrink-0 h-5 w-5" title="Previous month">
-          <ChevronLeft className="h-3 w-3" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={togglePlay} className="shrink-0 h-5 w-5" title={isPlaying ? "Pause" : "Play"}>
-          {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => moveDate(1)} className="shrink-0 h-5 w-5" title="Next month">
-          <ChevronRight className="h-3 w-3" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => moveDate(12)} className="shrink-0 h-5 w-5" title="Skip 1 year">
-          <ChevronsRight className="h-3 w-3" />
-        </Button>
 
-        {/* Speed selector */}
-        <div className="flex items-center gap-0 border border-border ml-1" style={{ borderRadius: "2px" }}>
-          {speeds.map((s) => (
-            <button
-              key={s.label}
-              onClick={() => {
-                setSpeed(s.ms);
-                if (isPlaying) startPlay(s.ms);
-              }}
-              className={`px-1.5 py-0.5 text-[8px] font-medium transition-colors ${
-                speed === s.ms ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
+      {/* ── Header row ─────────────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-2 border-b border-border">
+
+        {/* Label */}
+        <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground shrink-0">
+          Simulation
+        </span>
+
+        {/* Current sim date */}
+        <div className="flex items-center gap-1.5">
+          <span className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">Date</span>
+          <span className="font-mono text-[13px] font-semibold text-foreground">
+            {formatSimDate(currentDate)}
+          </span>
+          <span className="font-mono text-[9px] text-muted-foreground">
+            · month {dateIndex + 1} / {MONTHS_TOTAL}
+          </span>
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        {/* Separator */}
+        <div className="h-3 w-px bg-border hidden sm:block" />
+
+        {/* Countdown or complete badge */}
+        {isComplete ? (
+          <div className="flex items-center gap-1 text-gain">
+            <CheckCircle2 className="h-3 w-3" />
+            <span className="font-mono text-[9px] font-medium uppercase tracking-wider">
+              Simulation complete
+            </span>
+          </div>
+        ) : clockStartedAt ? (
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Clock className="h-3 w-3 shrink-0" />
+            <span className="font-mono text-[9px] uppercase tracking-wider">Next month in</span>
+            <span className="font-mono text-[11px] font-semibold text-foreground tabular-nums">
+              {pad(countdown!.h)}h {pad(countdown!.m)}m {pad(countdown!.s)}s
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Lock className="h-3 w-3" />
+            <span className="font-mono text-[9px] uppercase tracking-wider">Clock initialising…</span>
+          </div>
+        )}
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Rate badge + current event */}
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[8px] text-muted-foreground border border-border px-1.5 py-0.5 hidden sm:inline">
+            1h = 1mo
+          </span>
           {currentEvent && (
-            <span className="text-[9px] font-medium text-foreground px-1.5 py-0.5 border border-border bg-muted flex items-center gap-1" style={{ borderRadius: "2px" }}>
-              <MapPin className="h-2.5 w-2.5" /> {currentEvent}
+            <span className="font-mono text-[9px] font-medium text-foreground px-1.5 py-0.5 border border-border bg-muted flex items-center gap-1">
+              <MapPin className="h-2.5 w-2.5 shrink-0" />
+              {currentEvent}
             </span>
           )}
-          <div className="number-display text-[13px] font-semibold text-foreground font-serif min-w-[70px] text-center">
-            {currentDate}
-          </div>
         </div>
       </div>
 
-      {/* Timeline track */}
-      <div className="px-2 py-2">
-        {/* Year labels */}
+      {/* ── Timeline track ─────────────────────────────────────────────────── */}
+      <div className="px-3 py-2">
+
+        {/* Year labels — read-only */}
         <div className="flex justify-between mb-1">
           {years.map((yr) => (
-            <button
+            <span
               key={yr}
-              onClick={() => {
-                const idx = months.indexOf(`${yr}-01`);
-                if (idx !== -1) setCurrentDate(months[idx]);
-              }}
-              className={`text-[9px] font-medium transition-colors ${
-                currentYear === yr ? "text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"
+              className={`font-mono text-[9px] select-none ${
+                currentYear === yr
+                  ? "text-foreground font-semibold"
+                  : dateIndex >= (yr - 2020) * 12
+                  ? "text-muted-foreground"
+                  : "text-muted-foreground/30"
               }`}
             >
               {yr}
-            </button>
+            </span>
           ))}
         </div>
 
-        {/* Track */}
-        <div
-          ref={trackRef}
-          onClick={handleTrackClick}
-          className="relative h-6 cursor-pointer group"
-        >
-          <div className="absolute top-2.5 left-0 right-0 h-1 bg-border" />
+        {/* Track — read-only, no cursor/click */}
+        <div className="relative h-6">
+          {/* Background rail */}
+          <div className="absolute top-2.5 left-0 right-0 h-px bg-border" />
+
+          {/* Elapsed fill */}
           <div
-            className="absolute top-2.5 left-0 h-1 bg-foreground transition-all duration-300"
+            className="absolute top-2.5 left-0 h-px bg-foreground transition-all duration-1000"
             style={{ width: `${progressPct}%` }}
           />
 
+          {/* Year tick marks */}
           {years.map((yr) => {
             const idx = months.indexOf(`${yr}-01`);
-            const pct = (idx / (months.length - 1)) * 100;
+            const pct = (idx / (MONTHS_TOTAL - 1)) * 100;
+            const isPast = dateIndex >= idx;
             return (
-              <div key={yr} className="absolute top-1 w-px h-4 bg-border" style={{ left: `${pct}%` }} />
+              <div
+                key={yr}
+                className={`absolute top-1 w-px h-4 transition-colors ${isPast ? "bg-border" : "bg-border/40"}`}
+                style={{ left: `${pct}%` }}
+              />
             );
           })}
 
-          {eventPositions.map((ev) => (
-            <div
-              key={ev.date}
-              className="absolute top-0 w-1 h-1.5 bg-muted-foreground/60 group-hover:bg-foreground transition-colors"
-              style={{ left: `${ev.pct}%`, borderRadius: "1px" }}
-              title={ev.label}
-            />
-          ))}
+          {/* Event markers */}
+          {Object.entries(events).map(([date, label]) => {
+            const idx = months.indexOf(date);
+            if (idx === -1) return null;
+            const pct    = (idx / (MONTHS_TOTAL - 1)) * 100;
+            const isPast = idx <= dateIndex;
+            return (
+              <div
+                key={date}
+                title={label}
+                className={`absolute top-[3px] w-1 h-1.5 transition-colors ${
+                  isPast ? "bg-muted-foreground" : "bg-border"
+                }`}
+                style={{ left: `${pct}%`, borderRadius: "1px" }}
+              />
+            );
+          })}
 
+          {/* Thumb — shows current position */}
           <div
-            className="absolute top-0 -translate-x-1/2 transition-all duration-300"
+            className="absolute top-0 -translate-x-1/2 transition-all duration-1000"
             style={{ left: `${progressPct}%` }}
           >
             <div className="w-2.5 h-6 border border-foreground bg-background flex items-center justify-center" style={{ borderRadius: "1px" }}>
               <div className="w-0.5 h-3 bg-foreground" style={{ borderRadius: "1px" }} />
             </div>
           </div>
+
+          {/* Future lock overlay — faded pattern */}
+          <div
+            className="absolute top-0 right-0 bottom-0 pointer-events-none"
+            style={{
+              left: `${progressPct}%`,
+              backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 3px, hsl(var(--border)/0.15) 3px, hsl(var(--border)/0.15) 4px)",
+            }}
+          />
         </div>
 
-        {/* Month indicators */}
+        {/* Month indicators — current year, read-only */}
         <div className="flex justify-between mt-0.5 px-0">
           {monthNames.map((m, i) => {
             const monthStr = `${currentYear}-${String(i + 1).padStart(2, "0")}`;
             const isActive = currentDate === monthStr;
             const monthIdx = months.indexOf(monthStr);
-            const hasNews = !!newsData[monthStr];
+            const isPast   = monthIdx !== -1 && monthIdx <= dateIndex;
+            const hasNews  = !!newsData[monthStr];
             return (
-              <button
+              <span
                 key={i}
-                onClick={() => { if (monthIdx !== -1) setCurrentDate(months[monthIdx]); }}
-                className={`text-[7px] w-4 text-center transition-colors relative ${
+                className={`font-mono text-[7px] w-4 text-center select-none relative ${
                   isActive
                     ? "text-foreground font-bold"
-                    : monthIdx !== -1
-                    ? "text-muted-foreground hover:text-foreground cursor-pointer"
-                    : "text-muted-foreground/30 cursor-not-allowed"
+                    : isPast
+                    ? "text-muted-foreground"
+                    : "text-muted-foreground/25"
                 }`}
-                disabled={monthIdx === -1}
               >
                 {m}
-                {hasNews && <div className="absolute -top-0.5 right-0 h-1 w-1 rounded-full bg-foreground" />}
-              </button>
+                {hasNews && isPast && (
+                  <span className="absolute -top-0.5 right-0 h-1 w-1 rounded-full bg-foreground" />
+                )}
+              </span>
             );
           })}
         </div>
       </div>
 
-      {/* News section */}
+      {/* ── Explanation strip (shown while simulation is still in progress) ── */}
+      {!isComplete && clockStartedAt && (
+        <div className="border-t border-border px-3 py-1.5 flex items-center gap-2 bg-muted/20">
+          <Lock className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
+          <span className="font-mono text-[8px] text-muted-foreground">
+            Time advances automatically · 1 real-world hour = 1 month of market history · future data is locked
+          </span>
+        </div>
+      )}
+
+      {/* ── Current month news ──────────────────────────────────────────────── */}
       {currentNews.length > 0 && (
-        <div className="border-t border-border px-2 py-1.5">
-          <div className="flex items-center gap-1 mb-1">
+        <div className="border-t border-border px-3 py-1.5">
+          <div className="flex items-center gap-1 mb-1.5">
             <Newspaper className="h-3 w-3 text-muted-foreground" />
-            <span className="text-[8px] uppercase tracking-widest text-muted-foreground font-medium">Market News — {currentDate}</span>
+            <span className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">
+              Market News — {formatSimDate(currentDate)}
+            </span>
           </div>
           <div className="grid gap-1">
             {currentNews.map((news, i) => (
-              <div key={i} className="flex items-start gap-2 px-1.5 py-1 bg-muted/30 border border-border/50" style={{ borderRadius: "2px" }}>
+              <div key={i} className="flex items-start gap-2 px-2 py-1.5 bg-muted/30 border border-border/50" style={{ borderRadius: "2px" }}>
                 <div className={`shrink-0 mt-0.5 h-1.5 w-1.5 rounded-full ${
                   news.impact === "bullish" ? "bg-gain" : news.impact === "bearish" ? "bg-loss" : "bg-muted-foreground"
                 }`} />
@@ -372,10 +398,10 @@ export default function TimelineController() {
                   <div className="text-[10px] font-medium text-foreground leading-tight">{news.headline}</div>
                   <div className="text-[9px] text-muted-foreground leading-snug mt-0.5">{news.detail}</div>
                 </div>
-                <span className={`shrink-0 text-[7px] uppercase tracking-wider font-medium px-1 py-0.5 border ${
+                <span className={`shrink-0 font-mono text-[7px] uppercase tracking-wider font-medium px-1 py-0.5 border ${
                   news.impact === "bullish" ? "text-gain border-gain/30" : news.impact === "bearish" ? "text-loss border-loss/30" : "text-muted-foreground border-border"
                 }`} style={{ borderRadius: "2px" }}>
-                  {news.impact === "bullish" ? "▲ BULL" : news.impact === "bearish" ? "▼ BEAR" : "— NEUTRAL"}
+                  {news.impact === "bullish" ? "▲ BULL" : news.impact === "bearish" ? "▼ BEAR" : "— NEUT"}
                 </span>
               </div>
             ))}
@@ -383,12 +409,12 @@ export default function TimelineController() {
         </div>
       )}
 
-      {/* Playing indicator */}
-      {isPlaying && (
-        <div className="px-2 pb-1.5 flex items-center gap-1 border-t border-border pt-1">
-          <div className="h-1.5 w-1.5 rounded-full bg-gain animate-pulse" />
-          <span className="text-[8px] text-muted-foreground uppercase tracking-wider">
-            Auto-advancing — 1 month / {(speed / 1000).toFixed(1)}s
+      {/* ── Simulation complete banner ───────────────────────────────────────── */}
+      {isComplete && (
+        <div className="border-t border-border px-3 py-2 flex items-center gap-2 bg-muted/20">
+          <CheckCircle2 className="h-3.5 w-3.5 text-gain shrink-0" />
+          <span className="font-mono text-[9px] text-muted-foreground">
+            You have reached December 2026 — the end of the simulation. All 84 months of market history are unlocked.
           </span>
         </div>
       )}

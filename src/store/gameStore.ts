@@ -2,6 +2,27 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getPriceAtDate } from '@/data/priceData';
 
+// ── Simulation clock constants ───────────────────────────────────────────────
+// 1 real-world hour = 1 in-game month.
+// The 84-month simulation (Jan 2020 → Dec 2026) therefore takes 84 real hours
+// to complete, ensuring users cannot time-travel to exploit price history.
+export const MONTHS_TOTAL = 84;
+export const MS_PER_GAME_MONTH = 60 * 60 * 1000; // 1 hour in milliseconds
+
+/** Convert a 0-based month index to a "YYYY-MM" string. */
+export function indexToDate(idx: number): string {
+  const i = Math.max(0, Math.min(MONTHS_TOTAL - 1, idx));
+  const year = 2020 + Math.floor(i / 12);
+  const month = (i % 12) + 1;
+  return `${year}-${String(month).padStart(2, '0')}`;
+}
+
+/** Convert a "YYYY-MM" string to a 0-based month index. */
+export function dateToIndex(date: string): number {
+  const [yr, mo] = date.split('-').map(Number);
+  return (yr - 2020) * 12 + (mo - 1);
+}
+
 export interface Trade {
   id: string;
   assetId: string;
@@ -17,21 +38,34 @@ interface GameState {
   walletBalance: number;
   completedLessons: string[];
   unlockedAssets: string[];
-  holdings: Record<string, number>; // assetId -> quantity owned
+  holdings: Record<string, number>;
   tradeHistory: Trade[];
-  currentDate: string; // YYYY-MM
-  totalEarned: number; // sum of all quiz rewards ever received
-  quizScores: Record<string, number>; // lessonId -> weighted percentage
+  currentDate: string; // YYYY-MM — derived from clockStartedAt, not set by UI
+  totalEarned: number;
+  quizScores: Record<string, number>;
+  /** Wall-clock timestamp (ms) when the simulation clock was started. */
+  clockStartedAt: number | null;
 
   // Actions
   completeLesson: (lessonId: string, reward: number, assetsToUnlock: string[], score: number) => void;
   buyAsset: (assetId: string, quantity: number, pricePerUnit: number) => boolean;
   sellAsset: (assetId: string, quantity: number, pricePerUnit: number) => boolean;
+  /** Internal setter — not exposed to UI directly. */
   setCurrentDate: (date: string) => void;
+  /**
+   * Start the simulation clock. Safe to call multiple times — a no-op if
+   * already started. For users with existing trade history the clock is
+   * initialised so that the current game date matches their latest trade.
+   */
+  startClock: () => void;
+  /**
+   * Recompute currentDate from real-world elapsed time and update the store
+   * if the month has changed. Call this on mount and on a 1-second interval.
+   */
+  syncCurrentDate: () => void;
   getTotalPortfolioValue: () => number;
   getProfitLoss: () => number;
   getHoldingsValue: () => number;
-  /** Average cost per unit for a given asset, computed from trade history */
   getAvgCost: (assetId: string) => number;
 }
 
@@ -46,6 +80,7 @@ export const useGameStore = create<GameState>()(
       currentDate: '2020-01',
       totalEarned: 0,
       quizScores: {},
+      clockStartedAt: null,
 
       completeLesson: (lessonId, reward, assetsToUnlock, score) => {
         set((state) => {
@@ -117,6 +152,38 @@ export const useGameStore = create<GameState>()(
       },
 
       setCurrentDate: (date) => set({ currentDate: date }),
+
+      startClock: () => {
+        const state = get();
+        if (state.clockStartedAt !== null) return; // already running
+
+        // If the user has existing trade history, initialise the clock so
+        // that the current game date aligns with their most recent trade date.
+        // This preserves progress for returning users migrating to the new system.
+        let startMonthIndex = 0;
+        if (state.tradeHistory.length > 0) {
+          const latestDate = [...state.tradeHistory]
+            .sort((a, b) => a.timestamp - b.timestamp)
+            .pop()!.date;
+          startMonthIndex = Math.max(0, dateToIndex(latestDate));
+        }
+
+        set({ clockStartedAt: Date.now() - startMonthIndex * MS_PER_GAME_MONTH });
+      },
+
+      syncCurrentDate: () => {
+        const { clockStartedAt } = get();
+        if (clockStartedAt === null) return;
+
+        const elapsed = Date.now() - clockStartedAt;
+        const monthsElapsed = Math.floor(elapsed / MS_PER_GAME_MONTH);
+        const idx = Math.min(MONTHS_TOTAL - 1, Math.max(0, monthsElapsed));
+        const newDate = indexToDate(idx);
+
+        if (newDate !== get().currentDate) {
+          set({ currentDate: newDate });
+        }
+      },
 
       getHoldingsValue: () => {
         const state = get();
