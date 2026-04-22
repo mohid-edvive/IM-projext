@@ -1,6 +1,6 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useGameStore, dateToIndex, indexToDate, MONTHS_TOTAL, MS_PER_GAME_MONTH } from "@/store/gameStore";
-import { Newspaper, Clock, CheckCircle2, ChevronRight } from "lucide-react";
+import { Newspaper, Clock, ChevronRight, RefreshCw } from "lucide-react";
 
 // ── Month array ───────────────────────────────────────────────────────────────
 const months = Array.from({ length: MONTHS_TOTAL }, (_, i) => indexToDate(i));
@@ -145,11 +145,25 @@ const NEWS: Record<string, NewsItem[]> = {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function TimelineController() {
-  const currentDate     = useGameStore((s) => s.currentDate);
-  const clockStartedAt  = useGameStore((s) => s.clockStartedAt);
-  const syncCurrentDate = useGameStore((s) => s.syncCurrentDate);
+  const currentDate      = useGameStore((s) => s.currentDate);
+  const clockStartedAt   = useGameStore((s) => s.clockStartedAt);
+  const simulationCycle  = useGameStore((s) => s.simulationCycle);
+  const syncCurrentDate  = useGameStore((s) => s.syncCurrentDate);
 
-  const [, setTick] = useState(0);
+  const [, setTick]         = useState(0);
+  const [cycleFlash, setCycleFlash] = useState(false);
+  const prevCycleRef        = useRef(simulationCycle);
+
+  // Detect cycle increment and show flash notification
+  useEffect(() => {
+    if (simulationCycle !== prevCycleRef.current) {
+      prevCycleRef.current = simulationCycle;
+      setCycleFlash(true);
+      const t = setTimeout(() => setCycleFlash(false), 5000);
+      return () => clearTimeout(t);
+    }
+  }, [simulationCycle]);
+
   useEffect(() => {
     syncCurrentDate();
     const id = setInterval(() => { syncCurrentDate(); setTick((t) => t + 1); }, 1000);
@@ -158,20 +172,19 @@ export default function TimelineController() {
 
   const dateIndex   = dateToIndex(currentDate);
   const progressPct = (dateIndex / (MONTHS_TOTAL - 1)) * 100;
-  const isComplete  = dateIndex >= MONTHS_TOTAL - 1;
   const era         = useMemo(() => getEra(currentDate), [currentDate]);
   const currentNews = NEWS[currentDate] ?? [];
 
   // Live countdown
   let countdown: { h: number; m: number; s: number } | null = null;
-  if (clockStartedAt && !isComplete) {
+  if (clockStartedAt) {
     const elapsed     = Date.now() - clockStartedAt;
     const msIntoMonth = elapsed % MS_PER_GAME_MONTH;
     const msLeft      = MS_PER_GAME_MONTH - msIntoMonth;
     countdown = { h: Math.floor(msLeft / 3_600_000), m: Math.floor((msLeft % 3_600_000) / 60_000), s: Math.floor((msLeft % 60_000) / 1_000) };
   }
 
-  // Upcoming events (next 3 that haven't happened yet)
+  // Upcoming events (next 3 that haven't happened yet in this cycle)
   const upcomingEvents = useMemo(() =>
     EVENTS.filter(e => e.date > currentDate).slice(0, 3),
   [currentDate]);
@@ -188,22 +201,41 @@ export default function TimelineController() {
   return (
     <div className="border border-border overflow-hidden">
 
+      {/* ── Cycle reset flash banner ──────────────────────────────────────── */}
+      {cycleFlash && (
+        <div className="flex items-center gap-2.5 px-4 py-2.5 bg-amber/10 border-b border-amber/30">
+          <RefreshCw className="h-3.5 w-3.5 shrink-0" style={{ color: "hsl(var(--amber))" }} />
+          <div className="flex-1 min-w-0">
+            <span className="font-serif italic text-foreground text-sm">
+              Cycle {simulationCycle} begins — back to January 2020
+            </span>
+            <span className="font-mono text-[9px] text-muted-foreground ml-3">
+              All holdings liquidated at Dec 2026 prices · capital carried forward
+            </span>
+          </div>
+          <button onClick={() => setCycleFlash(false)}
+            className="font-mono text-[9px] text-muted-foreground hover:text-foreground shrink-0">✕</button>
+        </div>
+      )}
+
       {/* ── Row 1: Live header ─────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2.5 border-b border-border bg-muted/20">
 
         {/* LIVE badge */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {isComplete ? (
-            <CheckCircle2 className="h-3 w-3 text-gain" />
-          ) : (
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gain opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-gain" />
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gain opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-gain" />
+          </span>
+          <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground">
+            Live Simulation
+          </span>
+          {/* Cycle badge */}
+          {simulationCycle > 1 && (
+            <span className="font-mono text-[7px] uppercase tracking-wider px-1.5 py-0.5 border border-border text-muted-foreground ml-1">
+              Cycle {simulationCycle}
             </span>
           )}
-          <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground">
-            {isComplete ? "Simulation Complete" : "Live Simulation"}
-          </span>
         </div>
 
         <div className="h-3 w-px bg-border hidden sm:block" />
@@ -220,10 +252,8 @@ export default function TimelineController() {
 
         <div className="h-3 w-px bg-border hidden sm:block" />
 
-        {/* Countdown or complete */}
-        {isComplete ? (
-          <span className="font-mono text-[9px] text-gain">All 84 months unlocked — well done.</span>
-        ) : countdown ? (
+        {/* Countdown */}
+        {countdown ? (
           <div className="flex items-center gap-1.5">
             <Clock className="h-3 w-3 text-muted-foreground shrink-0" />
             <span className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider">Next month</span>
@@ -235,7 +265,7 @@ export default function TimelineController() {
 
         {/* Rate badge */}
         <span className="ml-auto font-mono text-[8px] text-muted-foreground border border-border px-1.5 py-0.5 hidden md:inline shrink-0">
-          1h real = 1mo sim
+          1h real = 1mo sim · loops
         </span>
       </div>
 
@@ -368,7 +398,7 @@ export default function TimelineController() {
       </div>
 
       {/* ── Row 4: Coming next ─────────────────────────────────────────────── */}
-      {upcomingEvents.length > 0 && !isComplete && (
+      {upcomingEvents.length > 0 && (
         <div className="border-t border-border px-4 py-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 bg-muted/10">
           <span className="font-mono text-[8px] uppercase tracking-[0.18em] text-muted-foreground/60 shrink-0">
             Coming up
@@ -419,7 +449,7 @@ export default function TimelineController() {
       )}
 
       {/* ── Row 6: Rate info strip ─────────────────────────────────────────── */}
-      {!isComplete && clockStartedAt && (
+      {clockStartedAt && (
         <div className="border-t border-border px-4 py-1.5 flex items-center gap-2">
           <div className="h-1.5 w-1.5 rounded-full bg-gain/50" />
           <span className="font-mono text-[8px] text-muted-foreground/60">

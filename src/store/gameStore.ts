@@ -4,10 +4,13 @@ import { getPriceAtDate } from '@/data/priceData';
 
 // ── Simulation clock constants ───────────────────────────────────────────────
 // 1 real-world hour = 1 in-game month.
-// The 84-month simulation (Jan 2020 → Dec 2026) therefore takes 84 real hours
-// to complete, ensuring users cannot time-travel to exploit price history.
+// The 84-month simulation (Jan 2020 → Dec 2026) takes 84 real hours.
+// When the cycle completes, all holdings are auto-liquidated at Dec 2026
+// prices, proceeds are carried into the wallet, and the clock restarts at
+// Jan 2020 — so the simulation loops indefinitely with compounding wealth.
 export const MONTHS_TOTAL = 84;
 export const MS_PER_GAME_MONTH = 60 * 60 * 1000; // 1 hour in milliseconds
+export const SIMULATION_END_DATE = '2026-12';
 
 /** Convert a 0-based month index to a "YYYY-MM" string. */
 export function indexToDate(idx: number): string {
@@ -43,8 +46,13 @@ interface GameState {
   currentDate: string; // YYYY-MM — derived from clockStartedAt, not set by UI
   totalEarned: number;
   quizScores: Record<string, number>;
-  /** Wall-clock timestamp (ms) when the simulation clock was started. */
+  /** Wall-clock timestamp (ms) when the current simulation cycle started. */
   clockStartedAt: number | null;
+  /**
+   * Which run-through of the 84-month simulation we are on.
+   * Starts at 1, increments on every auto-cycle-reset.
+   */
+  simulationCycle: number;
 
   // Actions
   completeLesson: (lessonId: string, reward: number, assetsToUnlock: string[], score: number) => void;
@@ -59,10 +67,20 @@ interface GameState {
    */
   startClock: () => void;
   /**
-   * Recompute currentDate from real-world elapsed time and update the store
-   * if the month has changed. Call this on mount and on a 1-second interval.
+   * Recompute currentDate from real-world elapsed time and update the store.
+   * When all 84 months have elapsed, triggers an auto-cycle-reset:
+   *   1. All open holdings are liquidated at Dec 2026 prices.
+   *   2. Proceeds are added to walletBalance.
+   *   3. clockStartedAt resets to Date.now() → simulation restarts at Jan 2020.
+   *   4. simulationCycle increments.
+   * Learning progress (completedLessons, unlockedAssets) is preserved.
    */
   syncCurrentDate: () => void;
+  /**
+   * Liquidate all holdings at SIMULATION_END_DATE prices, carry proceeds
+   * forward, and restart the clock. Called automatically by syncCurrentDate.
+   */
+  cycleReset: () => void;
   getTotalPortfolioValue: () => number;
   getProfitLoss: () => number;
   getHoldingsValue: () => number;
@@ -81,6 +99,7 @@ export const useGameStore = create<GameState>()(
       totalEarned: 0,
       quizScores: {},
       clockStartedAt: null,
+      simulationCycle: 1,
 
       completeLesson: (lessonId, reward, assetsToUnlock, score) => {
         set((state) => {
@@ -177,12 +196,58 @@ export const useGameStore = create<GameState>()(
 
         const elapsed = Date.now() - clockStartedAt;
         const monthsElapsed = Math.floor(elapsed / MS_PER_GAME_MONTH);
-        const idx = Math.min(MONTHS_TOTAL - 1, Math.max(0, monthsElapsed));
-        const newDate = indexToDate(idx);
 
+        // Full cycle elapsed → auto-reset and restart
+        if (monthsElapsed >= MONTHS_TOTAL) {
+          get().cycleReset();
+          return;
+        }
+
+        const newDate = indexToDate(Math.max(0, monthsElapsed));
         if (newDate !== get().currentDate) {
           set({ currentDate: newDate });
         }
+      },
+
+      cycleReset: () => {
+        const state = get();
+
+        // Liquidate every open holding at Dec 2026 (end-of-simulation) prices.
+        // This converts all unrealised gains/losses to cash and carries them
+        // forward as the user's starting capital for the next cycle.
+        let liquidationProceeds = 0;
+        const liquidationTrades: Trade[] = [];
+        const clearedHoldings: Record<string, number> = {};
+
+        for (const [assetId, qty] of Object.entries(state.holdings)) {
+          if (qty <= 0) continue;
+          const exitPrice = getPriceAtDate(assetId, SIMULATION_END_DATE);
+          const proceeds  = qty * exitPrice;
+          liquidationProceeds += proceeds;
+          liquidationTrades.push({
+            id:           `cycle${state.simulationCycle}-liq-${assetId}-${Date.now()}`,
+            assetId,
+            type:         'sell',
+            quantity:     qty,
+            pricePerUnit: exitPrice,
+            totalValue:   proceeds,
+            date:         SIMULATION_END_DATE,
+            timestamp:    Date.now(),
+          });
+          clearedHoldings[assetId] = 0;
+        }
+
+        set({
+          // Carry full wallet + liquidated proceeds into new cycle
+          walletBalance:   state.walletBalance + liquidationProceeds,
+          holdings:        { ...state.holdings, ...clearedHoldings },
+          tradeHistory:    [...state.tradeHistory, ...liquidationTrades],
+          // Restart clock from right now → game date = Jan 2020
+          clockStartedAt:  Date.now(),
+          currentDate:     '2020-01',
+          simulationCycle: state.simulationCycle + 1,
+          // Learning progress intentionally preserved
+        });
       },
 
       getHoldingsValue: () => {
