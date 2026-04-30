@@ -130,54 +130,67 @@ function EmbedModal({ href, label, onClose }: { href: string; label: string; onC
   );
 }
 
+// ── Section wrapper helpers ───────────────────────────────────────────────────
+const W = { maxWidth: 1080, margin: "0 auto", padding: "0 3rem" };
+
 // ── Sections ─────────────────────────────────────────────────────────────────
 
 function Hero() {
   return (
-    <section style={{ position: "relative", padding: "7rem 0 5rem", borderBottom: `1px solid ${T.border}` }}>
-      {/* Decorative mark */}
-      <svg style={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)", width: 260, height: 260, opacity: .06, pointerEvents: "none" }} viewBox="0 0 280 280" fill="none">
-        <circle cx="120" cy="120" r="100" stroke={T.ink} strokeWidth="8"/>
-        <line x1="198" y1="198" x2="272" y2="272" stroke={T.ink} strokeWidth="10" strokeLinecap="round"/>
-        <rect x="96" y="72" width="48" height="96" rx="6" fill={T.amber}/>
-        <line x1="120" y1="44" x2="120" y2="72" stroke={T.amber} strokeWidth="10" strokeLinecap="round"/>
-        <line x1="120" y1="168" x2="120" y2="196" stroke={T.amber} strokeWidth="10" strokeLinecap="round"/>
-      </svg>
+    <section style={{ background: T.ink, position: "relative", overflow: "hidden" }}>
+      {/* Ambient glow */}
+      <div style={{ position: "absolute", top: "-20%", right: "-10%", width: 600, height: 600, borderRadius: "50%", background: `radial-gradient(circle, rgba(200,133,44,.12) 0%, transparent 70%)`, pointerEvents: "none" }} />
 
-      <p style={{ ...mono, fontSize: ".72rem", letterSpacing: ".18em", textTransform: "uppercase", color: T.textFaint, marginBottom: "1.5rem" }}>
-        Interactive Media Capstone · NYU · 2025–2026
-      </p>
-      <h1 style={{ ...serif, fontStyle: "italic", fontSize: "clamp(3.5rem,7vw,6rem)", lineHeight: 1.02, marginBottom: ".5rem", color: T.ink }}>
-        Investigo<span style={{ color: T.amber, fontStyle: "normal" }}>.</span>
-      </h1>
-      <p style={{ ...mono, fontSize: ".85rem", letterSpacing: ".15em", textTransform: "uppercase", color: T.textDim, marginBottom: "2rem" }}>
-        Track · Trace · Invest
-      </p>
-      <p style={{ ...body, fontSize: "1.1rem", color: T.textDim, maxWidth: 560, marginBottom: "1.75rem" }}>
-        A gamified financial literacy platform built for a generation that invests on hype. This is the full archive of how it was made — seven months, five prototypes, twelve user tests, and one complete rebuild.
-      </p>
-      <p style={{ ...mono, fontSize: ".75rem", color: T.textFaint, letterSpacing: ".06em", marginBottom: "2rem" }}>
-        Mohidul Alam &nbsp;·&nbsp; Advisors: Jack B Du, Aaron Sherwood &nbsp;·&nbsp; April 2026
-      </p>
+      <div style={{ ...W, padding: "8rem 3rem 6rem" }}>
+        {/* Eyebrow */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "2.5rem" }}>
+          <div style={{ width: 28, height: 1, background: T.amber }} />
+          <span style={{ ...mono, fontSize: ".68rem", letterSpacing: ".2em", textTransform: "uppercase", color: "rgba(245,240,232,.45)" }}>
+            Interactive Media Capstone · NYU · 2025–2026
+          </span>
+        </div>
 
-      {/* Stat pills */}
-      <div style={{ display: "flex", flexWrap: "wrap" as const, gap: ".75rem", marginBottom: "2rem" }}>
-        {[["5","Prototypes"],["3","User Interviews"],["12","Testing Sessions"],["50","Lessons"],["130+","Assets Simulated"],["2020–2026","Historical Range"]].map(([v,l])=>(
-          <div key={l} style={{ background: T.paper2, border: `1px solid ${T.border}`, borderRadius: 100, padding: ".35rem 1rem", ...mono, fontSize: ".72rem", color: T.textDim }}>
-            <strong style={{ color: T.ink }}>{v}</strong> {l}
+        {/* Title */}
+        <h1 style={{ ...serif, fontStyle: "italic", fontSize: "clamp(4rem,9vw,7.5rem)", lineHeight: .95, marginBottom: "1.5rem", color: T.paper }}>
+          Invest<span style={{ color: T.amber }}>igo</span><span style={{ color: T.amber, fontStyle: "normal" }}>.</span>
+        </h1>
+
+        {/* Tagline */}
+        <p style={{ ...mono, fontSize: ".82rem", letterSpacing: ".22em", textTransform: "uppercase", color: "rgba(245,240,232,.4)", marginBottom: "2rem" }}>
+          Track · Trace · Invest
+        </p>
+
+        {/* Description + CTA in a grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "3rem", alignItems: "end", marginBottom: "3.5rem" }}>
+          <p style={{ ...body, fontSize: "1.1rem", color: "rgba(245,240,232,.65)", maxWidth: 540, lineHeight: 1.7 }}>
+            A gamified financial literacy platform built for a generation that invests on hype. This is the full archive — seven months, five prototypes, twelve user tests, one complete rebuild.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: ".75rem", flexShrink: 0 }}>
+            <a href="https://im-projext.vercel.app" target="_blank" rel="noopener noreferrer"
+              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: ".75rem 1.5rem", background: T.amber, color: T.ink, ...mono, fontSize: ".72rem", letterSpacing: ".1em", textTransform: "uppercase", borderRadius: 4, textDecoration: "none", fontWeight: 500 }}>
+              View Live ↗
+            </a>
+            <a href="#overview"
+              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: ".75rem 1.5rem", background: "transparent", border: "1px solid rgba(245,240,232,.15)", color: "rgba(245,240,232,.55)", ...mono, fontSize: ".72rem", letterSpacing: ".1em", textTransform: "uppercase", borderRadius: 4, textDecoration: "none" }}>
+              Read Archive ↓
+            </a>
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" as const }}>
-        <a href="https://im-projext.vercel.app" target="_blank" rel="noopener noreferrer"
-          style={{ display: "inline-flex", alignItems: "center", gap: ".5rem", padding: ".75rem 1.75rem", background: T.ink, color: T.paper, ...mono, fontSize: ".75rem", letterSpacing: ".1em", textTransform: "uppercase", borderRadius: 3, textDecoration: "none" }}>
-          View Live Platform ↗
-        </a>
-        <a href="#process"
-          style={{ display: "inline-flex", alignItems: "center", gap: ".5rem", padding: ".75rem 1.75rem", background: "transparent", border: `1px solid ${T.border}`, color: T.textDim, ...mono, fontSize: ".75rem", letterSpacing: ".1em", textTransform: "uppercase", borderRadius: 3, textDecoration: "none" }}>
-          Explore Process ↓
-        </a>
+        {/* Stats strip */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 1, background: "rgba(245,240,232,.06)", borderRadius: 6, overflow: "hidden", border: "1px solid rgba(245,240,232,.08)" }}>
+          {[["5","Prototypes"],["3","Interviews"],["12","Test Sessions"],["50","Lessons"],["130+","Assets"],["84 mo","Simulation"]].map(([v,l])=>(
+            <div key={l} style={{ padding: "1.5rem 1rem", textAlign: "center" as const }}>
+              <div style={{ ...serif, fontSize: "1.8rem", fontStyle: "italic", color: T.amber, lineHeight: 1, marginBottom: ".3rem" }}>{v}</div>
+              <div style={{ ...mono, fontSize: ".6rem", letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(245,240,232,.3)" }}>{l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Author */}
+        <p style={{ ...mono, fontSize: ".68rem", color: "rgba(245,240,232,.25)", letterSpacing: ".06em", marginTop: "2rem" }}>
+          Mohidul Alam &nbsp;·&nbsp; Advisors: Jack B Du, Aaron Sherwood &nbsp;·&nbsp; April 2026
+        </p>
       </div>
     </section>
   );
@@ -185,28 +198,58 @@ function Hero() {
 
 function Overview() {
   return (
-    <section id="overview" style={{ padding: "7rem 0", borderBottom: `1px solid ${T.border}` }}>
-      <SectionLabel n="00" label="Overview" />
-      <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: "1.5rem", color: T.ink }}>What is Investigo?</h2>
-      <p style={{ ...body, color: T.textDim, maxWidth: 680, fontSize: "1.05rem", marginBottom: "1rem" }}>
-        Investigo is a web-based gamified financial literacy platform. The name pairs <em>invest</em> with the Latin <em>investigo</em> — to track, to trace, to pursue evidence with deliberate attention. It combines a 60-day curriculum, a historically accurate market simulator, a knowledge-gated earn-to-invest mechanic, and a personalized analytics dashboard.
-      </p>
-      <p style={{ ...body, color: T.textDim, maxWidth: 680, fontSize: "1.05rem" }}>
-        The central argument: the crisis of hype-driven investing is a design problem. The solution is a platform where the architecture itself enforces the lesson — <strong style={{ color: T.ink }}>you cannot invest until you have demonstrated you understand what you are investing in.</strong>
-      </p>
+    <section id="overview" style={{ background: T.cream }}>
+      <div style={{ ...W, padding: "6rem 3rem" }}>
+        {/* Top label */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "3rem" }}>
+          <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: T.amber }}>00 — Overview</span>
+          <div style={{ flex: 1, height: 1, background: T.border }} />
+        </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: T.border, border: `1px solid ${T.border}`, borderRadius: 6, overflow: "hidden", margin: "3rem 0" }}>
-        {[
-          { num: "50",   color: T.amber, lbl: "Lessons across 5 units" },
-          { num: "60",   color: T.ink,   lbl: "Day structured curriculum" },
-          { num: "130+", color: T.amber, lbl: "Assets in simulator" },
-          { num: "12",   color: T.ink,   lbl: "Remote user testing sessions" },
-        ].map(s => (
-          <div key={s.lbl} style={{ background: T.paper, padding: "2rem 1.5rem" }}>
-            <div style={{ ...serif, fontSize: "3rem", lineHeight: 1, marginBottom: ".3rem", color: s.color }}>{s.num}</div>
-            <div style={{ ...mono, fontSize: ".68rem", letterSpacing: ".08em", textTransform: "uppercase", color: T.textFaint }}>{s.lbl}</div>
+        {/* Two-col layout */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start", marginBottom: "4rem" }}>
+          <div>
+            <h2 style={{ ...serif, fontStyle: "italic", fontSize: "clamp(2.5rem,4vw,3.5rem)", lineHeight: 1.05, color: T.ink, marginBottom: "1.5rem" }}>
+              What is<br/>Investigo?
+            </h2>
+            <p style={{ ...body, color: T.textDim, fontSize: "1rem", lineHeight: 1.75, marginBottom: "1rem" }}>
+              Investigo is a web-based gamified financial literacy platform. The name pairs <em>invest</em> with the Latin <em>investigo</em> — to track, to trace, to pursue evidence with deliberate attention.
+            </p>
+            <p style={{ ...body, color: T.textDim, fontSize: "1rem", lineHeight: 1.75 }}>
+              It combines a 60-day curriculum, a historically accurate market simulator, a knowledge-gated earn-to-invest mechanic, and a personalized analytics dashboard.
+            </p>
           </div>
-        ))}
+          <div>
+            {/* Pull quote */}
+            <div style={{ borderLeft: `3px solid ${T.amber}`, paddingLeft: "1.75rem", marginBottom: "2rem" }}>
+              <p style={{ ...serif, fontStyle: "italic", fontSize: "1.25rem", color: T.ink, lineHeight: 1.5, marginBottom: ".75rem" }}>
+                "The crisis of hype-driven investing is a design problem."
+              </p>
+              <p style={{ ...body, color: T.textDim, fontSize: ".9rem", lineHeight: 1.7 }}>
+                The solution is a platform where the architecture itself enforces the lesson — you cannot invest until you have demonstrated you understand what you are investing in.
+              </p>
+            </div>
+            <p style={{ ...mono, fontSize: ".68rem", letterSpacing: ".1em", color: T.textFaint, textTransform: "uppercase" }}>
+              NYU Interactive Media Capstone · Built Feb–Apr 2026
+            </p>
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: T.ink, borderRadius: 8, overflow: "hidden" }}>
+          {[
+            { num: "50",   color: T.amber, lbl: "Lessons across 5 units", sub: "with quizzes & flashcards" },
+            { num: "60",   color: "rgba(245,240,232,.9)", lbl: "Day curriculum", sub: "structured learning path" },
+            { num: "130+", color: T.amber, lbl: "Assets in simulator", sub: "stocks, ETFs, indices" },
+            { num: "12",   color: "rgba(245,240,232,.9)", lbl: "Testing sessions", sub: "3 rounds, think-aloud" },
+          ].map(s => (
+            <div key={s.lbl} style={{ padding: "2.5rem 2rem", position: "relative" as const, overflow: "hidden" }}>
+              <div style={{ ...serif, fontStyle: "italic", fontSize: "3.5rem", lineHeight: 1, color: s.color, marginBottom: ".4rem" }}>{s.num}</div>
+              <div style={{ ...mono, fontSize: ".68rem", letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(245,240,232,.6)", marginBottom: ".2rem" }}>{s.lbl}</div>
+              <div style={{ ...mono, fontSize: ".6rem", color: "rgba(245,240,232,.25)", letterSpacing: ".04em" }}>{s.sub}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -323,31 +366,49 @@ function TimelineCard({ item, index }: { item: typeof TIMELINE_ITEMS[number]; in
 
 function Process() {
   return (
-    <section id="process" style={{ padding: "7rem 0", borderBottom: `1px solid ${T.border}` }}>
-      <SectionLabel n="01" label="Process" />
-      <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: ".75rem", color: T.ink }}>Seven Months of Making</h2>
-      <p style={{ ...body, color: T.textDim, maxWidth: 620, marginBottom: "3rem" }}>
-        The project went through five completely different directions before arriving at the final platform. Each pivot was driven by real feedback, real user data, or an honest moment of realizing I was solving the wrong problem.
-      </p>
-
-      {/* Progress bar showing months */}
-      <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: "3rem", overflowX: "auto", paddingBottom: ".5rem" }}>
-        {["Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26"].map((m, i) => (
-          <div key={m} style={{ display: "flex", alignItems: "center", gap: ".5rem", flexShrink: 0 }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: i === 6 ? T.ink : T.amber, margin: "0 auto .3rem" }} />
-              <span style={{ ...mono, fontSize: ".6rem", color: T.textFaint, letterSpacing: ".06em" }}>{m}</span>
-            </div>
-            {i < 6 && <div style={{ width: 48, height: 1, background: `linear-gradient(to right, ${T.amber}, ${T.border})`, flexShrink: 0 }} />}
+    <section id="process" style={{ background: T.paper }}>
+      {/* Dark header band */}
+      <div style={{ background: T.ink }}>
+        <div style={{ ...W, padding: "4rem 3rem 3.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+            <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: T.amber }}>01 — Process</span>
+            <div style={{ flex: 1, height: 1, background: "rgba(245,240,232,.1)" }} />
           </div>
-        ))}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "3rem", alignItems: "end" }}>
+            <h2 style={{ ...serif, fontStyle: "italic", fontSize: "clamp(2.5rem,5vw,4rem)", color: T.paper, lineHeight: 1.05 }}>
+              Seven Months<br/>of Making
+            </h2>
+            <p style={{ ...body, color: "rgba(245,240,232,.5)", fontSize: ".9rem", maxWidth: 360, lineHeight: 1.7 }}>
+              Five completely different directions before arriving at the final platform. Each pivot driven by real feedback, real data, or an honest moment of realizing I was solving the wrong problem.
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Cards grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "1.25rem" }}>
-        {TIMELINE_ITEMS.map((item, i) => (
-          <TimelineCard key={item.title} item={item} index={i} />
-        ))}
+      {/* Month track */}
+      <div style={{ background: T.ink, borderBottom: `1px solid rgba(245,240,232,.06)` }}>
+        <div style={{ ...W, padding: "0 3rem 2rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 0, overflowX: "auto" as const, paddingBottom: ".25rem" }}>
+            {["Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26"].map((m, i) => (
+              <div key={m} style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+                <div style={{ textAlign: "center" as const, padding: "0 .5rem" }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: i === 6 ? T.amber : "rgba(200,133,44,.4)", margin: "0 auto .4rem" }} />
+                  <span style={{ ...mono, fontSize: ".58rem", color: "rgba(245,240,232,.3)", letterSpacing: ".06em", whiteSpace: "nowrap" as const }}>{m}</span>
+                </div>
+                {i < 6 && <div style={{ width: 60, height: 1, background: "rgba(200,133,44,.2)", flexShrink: 0 }} />}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Cards */}
+      <div style={{ ...W, padding: "3rem 3rem 5rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "1rem" }}>
+          {TIMELINE_ITEMS.map((item, i) => (
+            <TimelineCard key={item.title} item={item} index={i} />
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -368,36 +429,56 @@ const INTERVIEWS = [
 
 function Research() {
   return (
-    <section id="research" style={{ padding: "7rem 0", borderBottom: `1px solid ${T.border}` }}>
-      <SectionLabel n="02" label="Research" />
-      <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: ".75rem", color: T.ink }}>Precedents & Academic Grounding</h2>
-      <p style={{ ...body, color: T.textDim, maxWidth: 620, marginBottom: ".5rem" }}>
-        Four projects shaped the intellectual architecture of Investigo — each one teaching a specific lesson about what to build and what to avoid.
-      </p>
+    <section id="research" style={{ background: T.ink }}>
+      <div style={{ ...W, padding: "6rem 3rem" }}>
+        {/* Label */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "3.5rem" }}>
+          <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: T.amber }}>02 — Research</span>
+          <div style={{ flex: 1, height: 1, background: "rgba(245,240,232,.1)" }} />
+        </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "1.5rem", marginTop: "2.5rem" }}>
-        {PRECEDENTS.map(p => (
-          <div key={p.name} style={{ background: T.paper, border: `1px solid ${T.border}`, borderRadius: 6, padding: "2rem" }}>
-            <p style={{ ...mono, fontSize: ".65rem", letterSpacing: ".12em", textTransform: "uppercase", color: T.textFaint, marginBottom: ".5rem" }}>{p.year}</p>
-            <h3 style={{ ...serif, fontSize: "1.3rem", marginBottom: ".6rem", color: T.ink }}>{p.name}</h3>
-            <p style={{ ...body, fontSize: ".875rem", color: T.textDim, marginBottom: "1rem" }}>{p.body}</p>
-            <p style={{ ...body, fontSize: ".85rem", fontStyle: "italic", color: T.amber, paddingTop: ".75rem", borderTop: `1px solid ${T.border}` }}>{p.lesson}</p>
+        {/* Precedents */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "4rem", alignItems: "start", marginBottom: "5rem" }}>
+          <div>
+            <h2 style={{ ...serif, fontStyle: "italic", fontSize: "clamp(2rem,4vw,3rem)", color: T.paper, lineHeight: 1.1, marginBottom: "1rem" }}>
+              Precedents &amp;<br/>Academic<br/>Grounding
+            </h2>
+            <p style={{ ...body, color: "rgba(245,240,232,.45)", fontSize: ".9rem", lineHeight: 1.7 }}>
+              Four projects shaped the intellectual architecture — each teaching a specific lesson about what to build and what to avoid.
+            </p>
           </div>
-        ))}
-      </div>
-
-      <h3 style={{ ...serif, fontSize: "1.6rem", margin: "4rem 0 .5rem", color: T.ink }}>User Interviews</h3>
-      <p style={{ ...body, color: T.textDim, fontSize: ".9rem", maxWidth: 560, marginBottom: ".5rem" }}>Three formal interviews conducted November–December 2025. Each reshaped the project in a different direction.</p>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem", marginTop: "2rem" }}>
-        {INTERVIEWS.map(i => (
-          <div key={i.name} style={{ background: T.paper, border: `1px solid ${T.border}`, borderRadius: 6, padding: "1.75rem" }}>
-            <div style={{ width: 44, height: 44, borderRadius: "50%", background: T.ink, color: T.paper, ...serif, fontSize: "1.1rem", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>{i.initial}</div>
-            <div style={{ ...serif, fontSize: "1.1rem", marginBottom: ".15rem", color: T.ink }}>{i.name}</div>
-            <div style={{ ...mono, fontSize: ".65rem", color: T.textFaint, letterSpacing: ".06em", marginBottom: ".75rem" }}>{i.role}</div>
-            <div style={{ ...body, fontSize: ".85rem", color: T.textDim }}>{i.body}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: "rgba(245,240,232,.08)", borderRadius: 8, overflow: "hidden" }}>
+            {PRECEDENTS.map(p => (
+              <div key={p.name} style={{ background: T.ink2, padding: "1.75rem" }}>
+                <p style={{ ...mono, fontSize: ".6rem", letterSpacing: ".12em", textTransform: "uppercase", color: "rgba(245,240,232,.3)", marginBottom: ".5rem" }}>{p.year}</p>
+                <h3 style={{ ...serif, fontSize: "1.15rem", marginBottom: ".6rem", color: T.paper }}>{p.name}</h3>
+                <p style={{ ...body, fontSize: ".82rem", color: "rgba(245,240,232,.5)", marginBottom: "1rem", lineHeight: 1.65 }}>{p.body}</p>
+                <p style={{ ...body, fontSize: ".8rem", fontStyle: "italic", color: T.amber, paddingTop: ".75rem", borderTop: "1px solid rgba(245,240,232,.08)", lineHeight: 1.55 }}>{p.lesson}</p>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: "rgba(245,240,232,.08)", marginBottom: "4rem" }} />
+
+        {/* User interviews */}
+        <div style={{ marginBottom: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: "1.5rem", marginBottom: "2.5rem" }}>
+            <h3 style={{ ...serif, fontStyle: "italic", fontSize: "2rem", color: T.paper }}>User Interviews</h3>
+            <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(245,240,232,.3)" }}>Nov–Dec 2025 · 3 sessions · Remote</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1px", background: "rgba(245,240,232,.08)", borderRadius: 8, overflow: "hidden" }}>
+            {INTERVIEWS.map(i => (
+              <div key={i.name} style={{ background: T.ink2, padding: "2rem" }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: T.amber, color: T.ink, ...serif, fontSize: "1.2rem", fontStyle: "italic", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.25rem", fontWeight: 700 }}>{i.initial}</div>
+                <div style={{ ...serif, fontSize: "1.05rem", color: T.paper, marginBottom: ".2rem" }}>{i.name}</div>
+                <div style={{ ...mono, fontSize: ".6rem", color: "rgba(245,240,232,.3)", letterSpacing: ".06em", marginBottom: "1rem" }}>{i.role}</div>
+                <div style={{ ...body, fontSize: ".82rem", color: "rgba(245,240,232,.5)", lineHeight: 1.65 }}>{i.body}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -494,99 +575,95 @@ const FLOW_STEPS = [
 
 function Platform() {
   return (
-    <section id="platform" style={{ padding: "7rem 0", borderBottom: `1px solid ${T.border}` }}>
-      <SectionLabel n="03" label="Platform" />
-
-      {/* Header row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "2rem", alignItems: "end", marginBottom: "3rem" }}>
-        <div>
-          <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: ".75rem", color: T.ink }}>What Was Built</h2>
-          <p style={{ ...body, color: T.textDim, maxWidth: 600 }}>
-            The final platform brings together four interconnected systems — curriculum, simulator, analytics, and live news — built over February–April 2026.
+    <section id="platform" style={{ background: T.cream }}>
+      <div style={{ ...W, padding: "6rem 3rem" }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
+          <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: T.amber }}>03 — Platform</span>
+          <div style={{ flex: 1, height: 1, background: T.border }} />
+          <a href="https://im-projext.vercel.app" target="_blank" rel="noopener noreferrer"
+            style={{ ...mono, fontSize: ".68rem", letterSpacing: ".1em", textTransform: "uppercase", padding: ".5rem 1rem", background: T.ink, color: T.paper, borderRadius: 4, textDecoration: "none" }}>
+            View Live ↗
+          </a>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "end", marginBottom: "3.5rem" }}>
+          <h2 style={{ ...serif, fontStyle: "italic", fontSize: "clamp(2.5rem,4vw,3.5rem)", color: T.ink, lineHeight: 1.05 }}>What Was Built</h2>
+          <p style={{ ...body, color: T.textDim, fontSize: ".95rem", lineHeight: 1.7 }}>
+            Four interconnected systems — curriculum, simulator, analytics, and live news — all built over February–April 2026.
           </p>
         </div>
-        <a href="https://im-projext.vercel.app" target="_blank" rel="noopener noreferrer"
-          style={{ display: "inline-flex", alignItems: "center", gap: ".5rem", padding: ".7rem 1.4rem", background: T.ink, color: T.paper, ...mono, fontSize: ".72rem", letterSpacing: ".1em", textTransform: "uppercase", borderRadius: 4, textDecoration: "none", flexShrink: 0 }}>
-          View Live ↗
-        </a>
-      </div>
 
-      {/* Four systems strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: T.border, border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden", marginBottom: "3.5rem" }}>
-        {SYSTEMS.map(s => (
-          <div key={s.label} style={{ background: T.paper, padding: "1.75rem 1.5rem" }}>
-            <div style={{ fontSize: "1.6rem", marginBottom: ".6rem" }}>{s.icon}</div>
-            <div style={{ ...mono, fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: T.amber, marginBottom: ".25rem" }}>{s.label}</div>
-            <div style={{ ...serif, fontSize: "1.5rem", color: T.ink, marginBottom: ".5rem", lineHeight: 1 }}>{s.stat}</div>
-            <div style={{ ...body, fontSize: ".8rem", color: T.textDim, lineHeight: 1.55 }}>{s.desc}</div>
-          </div>
-        ))}
-      </div>
+        {/* Systems strip */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: T.ink, borderRadius: 8, overflow: "hidden", marginBottom: "2.5rem" }}>
+          {SYSTEMS.map(s => (
+            <div key={s.label} style={{ background: T.ink2, padding: "1.75rem 1.5rem" }}>
+              <div style={{ fontSize: "1.5rem", marginBottom: ".75rem" }}>{s.icon}</div>
+              <div style={{ ...mono, fontSize: ".6rem", letterSpacing: ".15em", textTransform: "uppercase", color: T.amber, marginBottom: ".3rem" }}>{s.label}</div>
+              <div style={{ ...serif, fontStyle: "italic", fontSize: "1.4rem", color: T.paper, marginBottom: ".5rem", lineHeight: 1 }}>{s.stat}</div>
+              <div style={{ ...body, fontSize: ".78rem", color: "rgba(245,240,232,.45)", lineHeight: 1.55 }}>{s.desc}</div>
+            </div>
+          ))}
+        </div>
 
-      {/* Featured large screenshot (home) */}
-      <div style={{ border: `1px solid ${T.border}`, borderRadius: 10, overflow: "hidden", marginBottom: "1.25rem", position: "relative" }}>
-        <ScreenCard s={SCREEN_ITEMS[0]} />
-      </div>
+        {/* Large screenshot */}
+        <div style={{ borderRadius: 10, overflow: "hidden", marginBottom: "1rem", boxShadow: "0 8px 40px rgba(26,40,32,.15)" }}>
+          <ScreenCard s={SCREEN_ITEMS[0]} />
+        </div>
 
-      {/* 3 smaller screenshots */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem", marginBottom: "4.5rem" }}>
-        {SCREEN_ITEMS.slice(1).map(s => <ScreenCard key={s.title} s={s} />)}
-      </div>
+        {/* 3 smaller screenshots */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem", marginBottom: "4rem" }}>
+          {SCREEN_ITEMS.slice(1).map(s => <ScreenCard key={s.title} s={s} />)}
+        </div>
 
-      {/* Earn-to-invest — flow + table */}
-      <div style={{ background: T.paper, border: `1px solid ${T.border}`, borderRadius: 10, padding: "2.5rem", marginBottom: "1rem" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "start" }}>
-
-          {/* Left: flow steps */}
-          <div>
-            <h3 style={{ ...serif, fontSize: "1.4rem", marginBottom: ".4rem", color: T.ink }}>Earn-to-Invest Mechanic</h3>
-            <p style={{ ...body, color: T.textDim, fontSize: ".85rem", marginBottom: "1.75rem" }}>
-              You start with zero. Every quiz pass converts knowledge into tradeable capital.
-            </p>
+        {/* Earn-to-invest */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: T.ink, borderRadius: 10, overflow: "hidden" }}>
+          {/* Left: flow */}
+          <div style={{ background: T.ink2, padding: "2.5rem" }}>
+            <h3 style={{ ...serif, fontStyle: "italic", fontSize: "1.6rem", color: T.paper, marginBottom: ".4rem" }}>Earn-to-Invest</h3>
+            <p style={{ ...body, color: "rgba(245,240,232,.4)", fontSize: ".82rem", marginBottom: "2rem" }}>Zero starting capital. Knowledge converts to currency.</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
               {FLOW_STEPS.map((step, i) => (
                 <div key={step.n} style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: i === FLOW_STEPS.length - 1 ? T.ink : "rgba(200,133,44,.15)", border: `1.5px solid ${i === FLOW_STEPS.length - 1 ? T.ink : T.amber}`, display: "flex", alignItems: "center", justifyContent: "center", ...mono, fontSize: ".6rem", color: i === FLOW_STEPS.length - 1 ? T.paper : T.amber }}>
+                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: i === FLOW_STEPS.length - 1 ? T.amber : "rgba(200,133,44,.15)", border: `1.5px solid ${T.amber}`, display: "flex", alignItems: "center", justifyContent: "center", ...mono, fontSize: ".58rem", color: i === FLOW_STEPS.length - 1 ? T.ink : T.amber, fontWeight: 600 }}>
                       {step.n}
                     </div>
-                    {i < FLOW_STEPS.length - 1 && <div style={{ width: 1, height: 28, background: `linear-gradient(to bottom, ${T.amber}, ${T.border})`, margin: "2px 0" }} />}
+                    {i < FLOW_STEPS.length - 1 && <div style={{ width: 1, height: 26, background: "rgba(200,133,44,.2)", margin: "3px 0" }} />}
                   </div>
-                  <div style={{ paddingBottom: i < FLOW_STEPS.length - 1 ? "1rem" : 0 }}>
-                    <div style={{ ...serif, fontSize: ".95rem", color: T.ink, marginBottom: ".15rem" }}>{step.label}</div>
-                    <div style={{ ...mono, fontSize: ".65rem", color: T.textFaint, letterSpacing: ".04em" }}>{step.sub}</div>
+                  <div style={{ paddingBottom: i < FLOW_STEPS.length - 1 ? ".9rem" : 0 }}>
+                    <div style={{ ...serif, fontSize: ".9rem", color: T.paper, marginBottom: ".1rem" }}>{step.label}</div>
+                    <div style={{ ...mono, fontSize: ".62rem", color: "rgba(245,240,232,.3)", letterSpacing: ".04em" }}>{step.sub}</div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Right: reward table */}
-          <div>
-            <h3 style={{ ...serif, fontSize: "1.4rem", marginBottom: "1.25rem", color: T.ink }}>Reward Structure</h3>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: ".82rem" }}>
+          {/* Right: table */}
+          <div style={{ background: T.ink, padding: "2.5rem" }}>
+            <h3 style={{ ...serif, fontStyle: "italic", fontSize: "1.6rem", color: T.paper, marginBottom: "1.5rem" }}>Reward Structure</h3>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
                   {["Unit","Topic","Reward","Unlocks"].map(h => (
-                    <th key={h} style={{ ...mono, fontSize: ".62rem", letterSpacing: ".08em", textTransform: "uppercase", color: T.textFaint, padding: ".6rem .75rem", textAlign: "left", borderBottom: `1px solid ${T.border}`, fontWeight: 400 }}>{h}</th>
+                    <th key={h} style={{ ...mono, fontSize: ".58rem", letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(245,240,232,.25)", padding: ".5rem .6rem", textAlign: "left", borderBottom: "1px solid rgba(245,240,232,.07)", fontWeight: 400 }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {EARN_ROWS.map((r, i) => (
-                  <tr key={r.lessons} style={{ background: i % 2 === 0 ? "transparent" : "rgba(26,40,32,.02)" }}>
-                    <td style={{ padding: ".6rem .75rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.04)`, ...mono, color: T.amber, fontWeight: r.bold ? 600 : 400, fontSize: r.bold ? ".8rem" : ".75rem" }}>{r.lessons}</td>
-                    <td style={{ padding: ".6rem .75rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.04)`, color: r.bold ? T.ink : T.textDim, ...body, fontWeight: r.bold ? 600 : 400 }}>{r.topic}</td>
-                    <td style={{ padding: ".6rem .75rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.04)`, ...mono, color: T.gain, fontWeight: r.bold ? 600 : 400, fontSize: ".78rem" }}>{r.reward}</td>
-                    <td style={{ padding: ".6rem .75rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.04)`, color: r.bold ? T.ink : T.textDim, ...body, fontSize: ".78rem" }}>{r.assets}</td>
+                  <tr key={r.lessons}>
+                    <td style={{ padding: ".55rem .6rem", borderBottom: r.bold ? "none" : "1px solid rgba(245,240,232,.04)", ...mono, color: T.amber, fontSize: r.bold ? ".78rem" : ".72rem", fontWeight: r.bold ? 600 : 400 }}>{r.lessons}</td>
+                    <td style={{ padding: ".55rem .6rem", borderBottom: r.bold ? "none" : "1px solid rgba(245,240,232,.04)", color: r.bold ? T.paper : "rgba(245,240,232,.45)", ...body, fontSize: ".78rem" }}>{r.topic}</td>
+                    <td style={{ padding: ".55rem .6rem", borderBottom: r.bold ? "none" : "1px solid rgba(245,240,232,.04)", ...mono, color: "#4ade80", fontSize: ".72rem" }}>{r.reward}</td>
+                    <td style={{ padding: ".55rem .6rem", borderBottom: r.bold ? "none" : "1px solid rgba(245,240,232,.04)", color: "rgba(245,240,232,.35)", ...body, fontSize: ".75rem" }}>{r.assets}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {/* Total callout */}
-            <div style={{ marginTop: "1rem", padding: ".75rem 1rem", background: "rgba(200,133,44,.08)", border: `1px solid rgba(200,133,44,.2)`, borderRadius: 5, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ ...body, fontSize: ".85rem", color: T.textDim }}>Max capital (all 50 lessons, perfect scores)</span>
-              <span style={{ ...serif, fontSize: "1.35rem", color: T.amber }}>~$15,000</span>
+            <div style={{ marginTop: "1.25rem", padding: ".75rem 1rem", background: "rgba(200,133,44,.1)", border: "1px solid rgba(200,133,44,.2)", borderRadius: 5, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ ...body, fontSize: ".8rem", color: "rgba(245,240,232,.45)" }}>Perfect scores, all 50 lessons</span>
+              <span style={{ ...serif, fontStyle: "italic", fontSize: "1.35rem", color: T.amber }}>~$15,000</span>
             </div>
           </div>
         </div>
@@ -605,50 +682,84 @@ const FINDINGS = [
 
 function Testing() {
   return (
-    <section id="testing" style={{ padding: "7rem 0", borderBottom: `1px solid ${T.border}` }}>
-      <SectionLabel n="04" label="User Testing" />
-      <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: ".75rem", color: T.ink }}>12 Remote Sessions</h2>
-      <p style={{ ...body, color: T.textDim, maxWidth: 660, marginBottom: "2rem" }}>
-        All sessions were remote. Zoom and Google Meet, think-aloud protocol, structured debrief questions. Three rounds across the semester: early, mid-stage, and near-final.
-      </p>
+    <section id="testing" style={{ background: T.paper }}>
+      <div style={{ ...W, padding: "6rem 3rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "3rem" }}>
+          <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: T.amber }}>04 — User Testing</span>
+          <div style={{ flex: 1, height: 1, background: T.border }} />
+          <span style={{ ...mono, fontSize: ".65rem", color: T.textFaint, letterSpacing: ".06em" }}>12 sessions · 3 rounds · Remote</span>
+        </div>
 
-      <div style={{ display: "grid", gap: "1rem" }}>
-        {FINDINGS.map(f => (
-          <div key={f.title}>
-            <div style={{ display: "grid", gridTemplateColumns: "3rem 1fr", gap: "1.25rem", alignItems: "start", background: T.paper, border: `1px solid ${T.border}`, borderRadius: 6, padding: "1.5rem" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem", background: f.type === "good" ? "rgba(200,133,44,.1)" : f.type === "insight" ? "rgba(200,133,44,.07)" : "rgba(26,40,32,.07)", flexShrink: 0 }}>{f.icon}</div>
-              <div>
-                <div style={{ ...serif, fontWeight: 600, fontSize: ".9rem", marginBottom: ".3rem", color: T.ink }}>{f.title}</div>
-                <div style={{ ...body, fontSize: ".85rem", color: T.textDim }}>{f.body}</div>
-              </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "5rem", alignItems: "start" }}>
+          <div style={{ position: "sticky" as const, top: "80px" }}>
+            <h2 style={{ ...serif, fontStyle: "italic", fontSize: "clamp(2rem,3.5vw,2.8rem)", color: T.ink, lineHeight: 1.1, marginBottom: "1rem" }}>
+              12 Remote<br/>Sessions
+            </h2>
+            <p style={{ ...body, color: T.textDim, fontSize: ".9rem", lineHeight: 1.7, marginBottom: "1.5rem" }}>
+              All research was remote. Zoom and Google Meet, think-aloud protocol, structured debrief questions. Three rounds across the semester.
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: T.border, borderRadius: 6, overflow: "hidden" }}>
+              {[["4","Round 1 — Early"],["4","Round 2 — Mid"],["4","Round 3 — Final"],["3","Interviews"]].map(([n,l])=>(
+                <div key={l} style={{ background: T.cream, padding: "1rem" }}>
+                  <div style={{ ...serif, fontStyle: "italic", fontSize: "1.6rem", color: T.amber, lineHeight: 1, marginBottom: ".25rem" }}>{n}</div>
+                  <div style={{ ...mono, fontSize: ".58rem", color: T.textFaint, letterSpacing: ".06em", textTransform: "uppercase" }}>{l}</div>
+                </div>
+              ))}
             </div>
-            {f.quote && (
-              <blockquote style={{ borderLeft: `3px solid ${T.amber}`, padding: "1rem 1.5rem", margin: "1rem 0", background: "rgba(200,133,44,.05)", borderRadius: "0 6px 6px 0", fontStyle: "italic", fontSize: "1rem", color: T.ink }}>
-                {f.quote.text}
-                <cite style={{ display: "block", fontSize: ".75rem", color: T.textFaint, fontStyle: "normal", ...mono, marginTop: ".5rem", letterSpacing: ".04em" }}>{f.quote.cite}</cite>
-              </blockquote>
-            )}
           </div>
-        ))}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+            {FINDINGS.map(f => (
+              <div key={f.title}>
+                <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "1.25rem", alignItems: "start", background: T.cream, border: `1px solid ${T.border}`, borderRadius: 8, padding: "1.5rem" }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", flexShrink: 0, background: f.type === "good" ? "rgba(42,122,74,.1)" : f.type === "insight" ? "rgba(200,133,44,.12)" : "rgba(220,50,50,.08)", border: `1px solid ${f.type === "good" ? "rgba(42,122,74,.2)" : f.type === "insight" ? "rgba(200,133,44,.2)" : "rgba(220,50,50,.15)"}` }}>{f.icon}</div>
+                  <div>
+                    <div style={{ ...serif, fontSize: ".95rem", marginBottom: ".35rem", color: T.ink }}>{f.title}</div>
+                    <div style={{ ...body, fontSize: ".84rem", color: T.textDim, lineHeight: 1.65 }}>{f.body}</div>
+                  </div>
+                </div>
+                {f.quote && (
+                  <div style={{ margin: ".75rem 0 0 3.5rem", padding: "1rem 1.25rem", borderLeft: `3px solid ${T.amber}`, background: "rgba(200,133,44,.04)", borderRadius: "0 6px 6px 0" }}>
+                    <p style={{ ...serif, fontStyle: "italic", fontSize: ".95rem", color: T.ink, marginBottom: ".4rem" }}>{f.quote.text}</p>
+                    <cite style={{ ...mono, fontSize: ".62rem", color: T.textFaint, letterSpacing: ".04em", fontStyle: "normal" }}>{f.quote.cite}</cite>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
 function Reflection() {
+  const grafs = [
+    { lead: "The most important discovery", text: "Seven months of building Investigo taught me things I could not have learned by reading about them — which is appropriately on-theme. I designed the simulator as an educational tool. In practice it functioned as something closer to a mirror." },
+    { lead: "The most humbling", text: "Six of twelve testers hit friction I designed into the system deliberately. The earn-to-invest mechanic is architecturally correct — and it annoyed half my test group. Good design and correct design are not always the same thing." },
+    { lead: "The most useful lesson", text: "The Calm Money Jars pivot forced me to think about what investing education is actually for. Not picking winners. Surviving long enough to benefit when you do. That reframing lives inside Investigo today even though the jars are gone." },
+    { lead: "The hardest thing to admit", text: "Investigo can make you a more informed investor. It cannot change the environment in which you invest. Social media and brokerage apps reward emotional reactivity over deliberate analysis. That is a larger design problem this platform alone cannot solve." },
+  ];
   return (
-    <section id="reflection" style={{ padding: "7rem 0", borderBottom: `1px solid ${T.border}` }}>
-      <SectionLabel n="05" label="Reflection" />
-      <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: "2rem", color: T.ink }}>What Building This Taught Me</h2>
-      <div style={{ maxWidth: 680 }}>
-        {[
-          "Seven months of building Investigo taught me things I could not have learned by reading about them — which is appropriately on-theme for a project about experiential learning. The most important discovery was how emotionally powerful the simulator became. I designed it as an educational tool. In practice it functioned as something closer to a mirror.",
-          "The most humbling: six of twelve testers hit friction I designed into the system deliberately. The earn-to-invest mechanic is architecturally correct — and it annoyed half my test group. Good design and correct design are not always the same thing. The placement assessment I am now building is not a workaround. It is the design becoming more honest about who actually shows up.",
-          "The most useful lesson from the early prototypes: the Calm Money Jars pivot in Prototype 3 forced me to think about what investing education is actually for. Not picking winners. Surviving long enough to benefit when you do. That reframing lives inside Investigo's curriculum today even though the jars are gone.",
-          "The hardest thing to admit: Investigo can make you a more informed investor. It cannot change the environment in which you invest. Social media platforms and brokerage apps are designed to reward emotional reactivity over deliberate analysis. That is a larger design problem this platform alone cannot solve. Worth naming — not as a reason to stop, but as an honest acknowledgment of where the work ends and a harder problem begins.",
-        ].map((p, i) => (
-          <p key={i} style={{ ...body, color: T.textDim, marginBottom: "1.5rem", fontSize: ".975rem" }}>{p}</p>
-        ))}
+    <section id="reflection" style={{ background: T.ink }}>
+      <div style={{ ...W, padding: "6rem 3rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "4rem" }}>
+          <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: T.amber }}>05 — Reflection</span>
+          <div style={{ flex: 1, height: 1, background: "rgba(245,240,232,.1)" }} />
+        </div>
+
+        <h2 style={{ ...serif, fontStyle: "italic", fontSize: "clamp(2.5rem,5vw,4rem)", color: T.paper, lineHeight: 1.05, maxWidth: 700, marginBottom: "4rem" }}>
+          What Building This<br/>Taught Me
+        </h2>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: "rgba(245,240,232,.06)", borderRadius: 10, overflow: "hidden" }}>
+          {grafs.map(g => (
+            <div key={g.lead} style={{ background: T.ink2, padding: "2.5rem" }}>
+              <div style={{ ...mono, fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: T.amber, marginBottom: ".75rem" }}>{g.lead}</div>
+              <p style={{ ...body, fontSize: ".95rem", color: "rgba(245,240,232,.65)", lineHeight: 1.75 }}>{g.text}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -665,19 +776,31 @@ const FUTURE_ITEMS = [
 
 function Future() {
   return (
-    <section id="next" style={{ padding: "7rem 0" }}>
-      <SectionLabel n="06" label="Future Steps" />
-      <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: ".75rem", color: T.ink }}>Where This Goes Next</h2>
-      <p style={{ ...body, color: T.textDim, maxWidth: 580, marginBottom: ".5rem" }}>Six priorities — all direct responses to specific findings from testing and production, not a wishlist.</p>
+    <section id="next" style={{ background: T.cream }}>
+      <div style={{ ...W, padding: "6rem 3rem 7rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "3.5rem" }}>
+          <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".2em", textTransform: "uppercase", color: T.amber }}>06 — Future Steps</span>
+          <div style={{ flex: 1, height: 1, background: T.border }} />
+        </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem", marginTop: "2.5rem" }}>
-        {FUTURE_ITEMS.map(f => (
-          <div key={f.num} style={{ background: T.paper, border: `1px solid ${T.border}`, borderRadius: 6, padding: "1.5rem" }}>
-            <div style={{ ...serif, fontSize: "2.5rem", color: T.paper3, lineHeight: 1, marginBottom: ".75rem" }}>{f.num}</div>
-            <div style={{ ...serif, fontSize: "1rem", marginBottom: ".4rem", color: T.ink }}>{f.title}</div>
-            <div style={{ ...body, fontSize: ".82rem", color: T.textDim }}>{f.body}</div>
-          </div>
-        ))}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "4rem", alignItems: "start", marginBottom: "3rem" }}>
+          <h2 style={{ ...serif, fontStyle: "italic", fontSize: "clamp(2rem,3.5vw,3rem)", color: T.ink, lineHeight: 1.1 }}>
+            Where This<br/>Goes Next
+          </h2>
+          <p style={{ ...body, color: T.textDim, fontSize: ".95rem", lineHeight: 1.7 }}>
+            Six priorities — all direct responses to specific findings from testing and production. Not a wishlist; a roadmap driven by evidence.
+          </p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1px", background: T.border, borderRadius: 10, overflow: "hidden" }}>
+          {FUTURE_ITEMS.map((f, i) => (
+            <div key={f.num} style={{ background: i % 2 === 0 ? T.paper : T.cream, padding: "2rem 1.75rem" }}>
+              <div style={{ ...serif, fontStyle: "italic", fontSize: "3rem", color: T.border, lineHeight: 1, marginBottom: ".75rem" }}>{f.num}</div>
+              <div style={{ ...serif, fontSize: "1.05rem", color: T.ink, marginBottom: ".5rem" }}>{f.title}</div>
+              <div style={{ ...body, fontSize: ".82rem", color: T.textDim, lineHeight: 1.65 }}>{f.body}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -702,50 +825,41 @@ export default function Archive() {
   return (
     <div
       ref={topRef}
-      style={{
-        background:  T.cream,
-        color:       T.text,
-        fontFamily:  "'Lora', Georgia, serif",
-        fontSize:    17,
-        lineHeight:  1.75,
-        overflowX:   "hidden",
-        // Override the dark theme applied by the parent <div className="dark">
-        colorScheme: "light",
-      }}
+      style={{ color: T.text, fontFamily: "'Lora', Georgia, serif", fontSize: 17, lineHeight: 1.75, overflowX: "hidden", colorScheme: "light" as const }}
       className="light"
     >
-      {/* Subtle paper grain */}
-      <div style={{ position: "fixed", inset: 0, backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E\")", pointerEvents: "none", zIndex: 0, opacity: .6 }} />
-
       {/* Sticky in-page nav */}
-      <nav style={{ position: "sticky", top: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "2rem", padding: "0 3rem", height: 48, background: "rgba(245,240,232,.92)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${T.border}` }}>
-        {[["#overview","Overview"],["#process","Process"],["#research","Research"],["#platform","Platform"],["#testing","Testing"],["#reflection","Reflection"],["#next","Next"]].map(([href,label])=>(
-          <a key={href} href={href} style={{ ...mono, fontSize: ".7rem", letterSpacing: ".1em", textTransform: "uppercase", color: T.textDim, textDecoration: "none" }}>{label}</a>
-        ))}
+      <nav style={{ position: "sticky", top: 0, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2rem", height: 44, background: "rgba(26,40,32,.96)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(245,240,232,.08)" }}>
+        <span style={{ ...serif, fontStyle: "italic", fontSize: ".95rem", color: T.amber }}>Investigo</span>
+        <div style={{ display: "flex", gap: "1.5rem" }}>
+          {[["#overview","Overview"],["#process","Process"],["#research","Research"],["#platform","Platform"],["#testing","Testing"],["#reflection","Reflection"],["#next","Next"]].map(([href,label])=>(
+            <a key={href} href={href} style={{ ...mono, fontSize: ".62rem", letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(245,240,232,.4)", textDecoration: "none" }}>{label}</a>
+          ))}
+        </div>
       </nav>
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 1080, margin: "0 auto", padding: "0 3rem" }}>
-        <Hero />
-        <Overview />
-        <Process />
-        <Research />
-        <Platform />
-        <Testing />
-        <Reflection />
-        <Future />
+      {/* Sections — each owns its own full-width background */}
+      <Hero />
+      <Overview />
+      <Process />
+      <Research />
+      <Platform />
+      <Testing />
+      <Reflection />
+      <Future />
 
-        {/* Page footer */}
-        <div style={{ borderTop: `1px solid ${T.border}`, padding: "3rem 0", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap" as const, gap: "1rem" }}>
+      {/* Footer */}
+      <div style={{ background: T.ink, borderTop: "1px solid rgba(245,240,232,.08)" }}>
+        <div style={{ ...W, padding: "2.5rem 3rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" as const, gap: "1rem" }}>
           <div>
-            <div style={{ ...serif, fontStyle: "italic", fontSize: "1.5rem", color: T.ink, marginBottom: ".4rem" }}>Investigo</div>
-            <div style={{ ...mono, fontSize: ".7rem", color: T.textFaint, letterSpacing: ".04em" }}>
-              Mohidul Alam &nbsp;·&nbsp; Interactive Media Capstone · NYU · April 2026<br />
-              Advisors: Jack B Du, Aaron Sherwood
+            <div style={{ ...serif, fontStyle: "italic", fontSize: "1.25rem", color: T.paper, marginBottom: ".25rem" }}>Investigo</div>
+            <div style={{ ...mono, fontSize: ".62rem", color: "rgba(245,240,232,.25)", letterSpacing: ".04em" }}>
+              Mohidul Alam · Interactive Media Capstone · NYU · April 2026 · Advisors: Jack B Du, Aaron Sherwood
             </div>
           </div>
           <div style={{ display: "flex", gap: "1.5rem" }}>
-            <a href="https://im-projext.vercel.app" target="_blank" rel="noopener noreferrer" style={{ ...mono, fontSize: ".72rem", letterSpacing: ".06em", color: T.textDim, textDecoration: "none" }}>Live Platform ↗</a>
-            <a href="#" style={{ ...mono, fontSize: ".72rem", letterSpacing: ".06em", color: T.textDim, textDecoration: "none" }}>Back to Top ↑</a>
+            <a href="https://im-projext.vercel.app" target="_blank" rel="noopener noreferrer" style={{ ...mono, fontSize: ".65rem", letterSpacing: ".06em", color: T.amber, textDecoration: "none" }}>Live Platform ↗</a>
+            <a href="#" style={{ ...mono, fontSize: ".65rem", letterSpacing: ".06em", color: "rgba(245,240,232,.3)", textDecoration: "none" }}>Back to Top ↑</a>
           </div>
         </div>
       </div>
