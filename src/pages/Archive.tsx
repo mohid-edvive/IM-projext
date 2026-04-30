@@ -605,16 +605,6 @@ function Platform() {
           ))}
         </div>
 
-        {/* Large screenshot */}
-        <div style={{ borderRadius: 10, overflow: "hidden", marginBottom: "1rem", boxShadow: "0 8px 40px rgba(26,40,32,.15)" }}>
-          <ScreenCard s={SCREEN_ITEMS[0]} />
-        </div>
-
-        {/* 3 smaller screenshots */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem", marginBottom: "4rem" }}>
-          {SCREEN_ITEMS.slice(1).map(s => <ScreenCard key={s.title} s={s} />)}
-        </div>
-
         {/* Earn-to-invest */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: T.ink, borderRadius: 10, overflow: "hidden" }}>
           {/* Left: flow */}
