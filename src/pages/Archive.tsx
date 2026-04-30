@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 // ── Brand tokens (light / paper theme) ────────────────────────────────────────
 const T = {
@@ -229,12 +230,77 @@ function Research() {
   );
 }
 
+const BASE_URL = "https://im-projext.vercel.app";
+// Thum.io renders a real browser screenshot — no API key required.
+function screenshotUrl(path: string) {
+  return `https://image.thum.io/get/width/1200/crop/675/noanimate/${BASE_URL}${path}`;
+}
+
 const SCREEN_ITEMS = [
-  { title: "Landing Page", desc: "Hero with S&P 500 simulation chart annotated with COVID crash, meme stocks, Fed rate hikes, and AI rally." },
-  { title: "Lesson View", desc: "Curriculum sidebar, virtual wallet balance, and earn-to-invest reward shown inline with content and quiz." },
-  { title: "Trading Simulator", desc: "Real historical data 2020–2026. Annotated news events, P&L tracking, open positions, trade history." },
-  { title: "Analytics Dashboard", desc: "Investor type classification, behavioral radar, buy/sell timing scores, and personalized insight cards." },
+  {
+    title: "Landing Page",
+    desc:  "Hero with S&P 500 simulation chart annotated with COVID crash, meme stocks, Fed rate hikes, and AI rally.",
+    img:   screenshotUrl("/"),
+    href:  "/",
+    internal: true,
+  },
+  {
+    title: "Learn — Curriculum",
+    desc:  "50 lessons across 5 units. Earn virtual capital by completing quizzes. Progress gates access to the simulator.",
+    img:   screenshotUrl("/learn"),
+    href:  "/learn",
+    internal: true,
+  },
+  {
+    title: "Trading Simulator",
+    desc:  "Real historical data 2020–2026. Annotated news events, P&L tracking, open positions, real-time simulation clock.",
+    img:   screenshotUrl("/trade"),
+    href:  "/trade",
+    internal: true,
+  },
+  {
+    title: "Analytics Dashboard",
+    desc:  "Investor type classification, behavioral radar, buy/sell timing scores, and personalized insight cards.",
+    img:   screenshotUrl("/analysis"),
+    href:  "/analysis",
+    internal: true,
+  },
 ];
+
+function ScreenCard({ s }: { s: typeof SCREEN_ITEMS[number] }) {
+  const [loaded, setLoaded] = useState(false);
+  const content = (
+    <div style={{ border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden", background: T.paper, transition: "transform .2s, box-shadow .2s", cursor: "pointer" }}
+      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-3px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 30px rgba(26,40,32,.12)"; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ""; (e.currentTarget as HTMLDivElement).style.boxShadow = ""; }}>
+      {/* Screenshot */}
+      <div style={{ width: "100%", aspectRatio: "16/9", background: "#1a2820", position: "relative", overflow: "hidden" }}>
+        {!loaded && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ ...mono, fontSize: ".65rem", color: "rgba(245,240,232,.3)", letterSpacing: ".1em" }}>Loading screenshot…</span>
+          </div>
+        )}
+        <img
+          src={s.img}
+          alt={s.title}
+          onLoad={() => setLoaded(true)}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: loaded ? "block" : "none" }}
+        />
+        {/* Overlay badge */}
+        <div style={{ position: "absolute", top: 10, right: 10, ...mono, fontSize: ".62rem", letterSpacing: ".08em", textTransform: "uppercase", padding: ".25rem .6rem", background: "rgba(26,40,32,.75)", color: "rgba(245,240,232,.7)", backdropFilter: "blur(6px)", borderRadius: 3 }}>
+          Open ↗
+        </div>
+      </div>
+      <div style={{ padding: "1.1rem 1.25rem" }}>
+        <h4 style={{ ...serif, fontSize: "1rem", marginBottom: ".25rem", color: T.ink }}>{s.title}</h4>
+        <p style={{ ...body, fontSize: ".82rem", color: T.textDim }}>{s.desc}</p>
+      </div>
+    </div>
+  );
+  return s.internal
+    ? <Link to={s.href} style={{ textDecoration: "none" }}>{content}</Link>
+    : <a href={s.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>{content}</a>;
+}
 
 const EARN_ROWS = [
   { lessons: "1–10",  topic: "Foundations: stocks, markets, exchanges", reward: "$100–$200", assets: "SPY, VTI" },
@@ -255,68 +321,7 @@ function Platform() {
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "1.5rem", marginTop: "2.5rem" }}>
-        {SCREEN_ITEMS.map((s, idx) => {
-          const bars = [35,50,28,18,40,65,82,90,72,95,100];
-          return (
-            <div key={s.title} style={{ border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden", background: T.paper }}>
-              <div style={{ width: "100%", aspectRatio: "16/9", background: "#1a2820", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ position: "absolute", inset: 0, padding: ".85rem 1rem" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: ".6rem" }}>
-                    <span style={{ ...mono, fontSize: ".45rem", color: T.amber, letterSpacing: ".1em" }}>{idx === 0 ? "INVESTIGO" : idx === 1 ? "Lesson 12 / 50" : idx === 2 ? "Markets" : "Analytics"}</span>
-                    {idx === 0 && <div style={{ width: 30, height: 12, background: T.amber, borderRadius: 100 }} />}
-                    {idx === 1 && <span style={{ ...mono, fontSize: ".42rem", color: "rgba(200,133,44,.7)" }}>24% complete</span>}
-                    {idx === 2 && <span style={{ ...mono, fontSize: ".42rem", color: T.amber }}>Mar 15, 2022</span>}
-                    {idx === 3 && <span style={{ ...mono, fontSize: ".42rem", color: T.amber }}>Score: 74/100</span>}
-                  </div>
-                  {idx === 0 && (
-                    <>
-                      <div style={{ ...serif, fontStyle: "italic", fontSize: ".75rem", color: T.paper, marginBottom: ".25rem" }}>Track. Learn. Invest.</div>
-                      <div style={{ ...mono, fontSize: ".45rem", color: "rgba(245,240,232,.5)", marginBottom: ".5rem" }}>50 lessons · 130+ stocks · 2020–2026</div>
-                      <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 28 }}>
-                        {bars.map((h,i)=><div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "1px 1px 0 0", background: T.amber, opacity: .45 }} />)}
-                      </div>
-                    </>
-                  )}
-                  {idx === 1 && (
-                    <>
-                      <div style={{ ...serif, fontStyle: "italic", fontSize: ".65rem", color: T.paper, marginBottom: ".25rem" }}>What is an Index Fund?</div>
-                      <div style={{ ...mono, fontSize: ".45rem", color: "rgba(245,240,232,.5)", marginBottom: ".5rem" }}>8 min read</div>
-                      <div style={{ display: "inline-block", padding: ".12rem .4rem", background: "rgba(200,133,44,.15)", border: "1px solid rgba(200,133,44,.3)", borderRadius: 100, ...mono, fontSize: ".45rem", color: T.amber }}>Virtual Wallet: $3,240</div>
-                    </>
-                  )}
-                  {idx === 2 && (
-                    <>
-                      <div style={{ display: "flex", gap: 3, marginBottom: ".4rem" }}>
-                        <span style={{ padding: ".1rem .35rem", borderRadius: 3, ...mono, fontSize: ".42rem", background: "rgba(0,200,100,.15)", color: "#00c864", border: "1px solid rgba(0,200,100,.25)" }}>+88.2%</span>
-                        <span style={{ padding: ".1rem .35rem", borderRadius: 3, ...mono, fontSize: ".42rem", background: "rgba(200,133,44,.15)", color: T.amber, border: "1px solid rgba(200,133,44,.25)" }}>$8,912</span>
-                      </div>
-                      <div style={{ ...mono, fontSize: ".42rem", color: "rgba(245,240,232,.5)", padding: ".25rem .4rem", background: "rgba(220,50,50,.08)", borderLeft: "1px solid rgba(220,50,50,.3)", marginBottom: ".4rem" }}>Fed raises rates 0.25% — first since 2018</div>
-                      <div style={{ display: "flex", gap: 3, alignItems: "flex-end", height: 22 }}>
-                        {[60,40,80,30,55,70].map((h,i)=><div key={i} style={{ flex: 1, height: `${h}%`, background: i===3?"#e05050":T.amber, opacity: .35, borderRadius: 1 }} />)}
-                      </div>
-                    </>
-                  )}
-                  {idx === 3 && (
-                    <>
-                      <div style={{ display: "flex", gap: 3, marginBottom: ".35rem" }}>
-                        <span style={{ padding: ".1rem .35rem", borderRadius: 3, ...mono, fontSize: ".42rem", background: "rgba(0,200,100,.15)", color: "#00c864", border: "1px solid rgba(0,200,100,.25)" }}>Win Rate 68%</span>
-                        <span style={{ padding: ".1rem .35rem", borderRadius: 3, ...mono, fontSize: ".42rem", background: "rgba(200,133,44,.15)", color: T.amber, border: "1px solid rgba(200,133,44,.25)" }}>+88% return</span>
-                      </div>
-                      <div style={{ display: "inline-block", marginBottom: ".4rem", padding: ".12rem .4rem", background: "rgba(167,139,250,.12)", border: "1px solid rgba(167,139,250,.25)", borderRadius: 3, ...mono, fontSize: ".45rem", color: "#a78bfa" }}>Growth Investor</div>
-                      <div style={{ display: "flex", gap: 3, alignItems: "flex-end", height: 22 }}>
-                        {[80,55,65,42,76].map((h,i)=><div key={i} style={{ flex: 1, height: `${h}%`, background: i===1?"#00c864":i===3?"#e05050":T.amber, opacity: .4, borderRadius: 1 }} />)}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div style={{ padding: "1.1rem 1.25rem" }}>
-                <h4 style={{ ...serif, fontSize: "1rem", marginBottom: ".25rem", color: T.ink }}>{s.title}</h4>
-                <p style={{ ...body, fontSize: ".82rem", color: T.textDim }}>{s.desc}</p>
-              </div>
-            </div>
-          );
-        })}
+        {SCREEN_ITEMS.map(s => <ScreenCard key={s.title} s={s} />)}
       </div>
 
       {/* Design system swatches */}
