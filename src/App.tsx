@@ -10,6 +10,7 @@ import Learn from "./pages/Learn";
 import Lesson from "./pages/Lesson";
 import Trade from "./pages/Trade";
 import Analysis from "./pages/Analysis";
+import Archive from "./pages/Archive";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/lesson/:id" element={<Lesson />} />
             <Route path="/trade" element={<Trade />} />
             <Route path="/analysis" element={<Analysis />} />
+            <Route path="/archive" element={<Archive />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />

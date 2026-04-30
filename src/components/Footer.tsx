@@ -124,11 +124,8 @@ export default function Footer() {
                   </span>
                 </Link>
               ))}
-              {/* Archive — standalone HTML page */}
-              <a
-                href="/archive.html"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/archive"
                 className="flex items-center gap-2 transition-colors group"
                 style={{ color: "hsl(var(--paper) / 0.55)" }}
               >
@@ -142,7 +139,7 @@ export default function Footer() {
                 >
                   Archive
                 </span>
-              </a>
+              </Link>
             </nav>
           </div>
 
