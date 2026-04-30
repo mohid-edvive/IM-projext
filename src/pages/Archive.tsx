@@ -146,34 +146,119 @@ const TIMELINE_ITEMS = [
   { phase: "March–April 2026 — Phase 11", title: "12 Remote User Testing Sessions", body: "All research was remote. Twelve sessions across three rounds via Zoom and Google Meet, think-aloud protocol, structured debrief questions. Round 1: early prototype. Round 2: curriculum and simulator integrated. Round 3: near-complete platform, full flow from onboarding to analytics.", link: { href: "https://im-projext.vercel.app", label: "im-projext.vercel.app (final platform)" }, tags: [{label:"12 Sessions",variant:"amber" as const},{label:"Think-Aloud Protocol"},{label:"3 Rounds"},{label:"Final Platform",variant:"ink" as const}] },
 ];
 
+function TimelineCard({ item, index }: { item: typeof TIMELINE_ITEMS[number]; index: number }) {
+  const phaseNum = String(index + 1).padStart(2, "0");
+  const isMilestone = item.tags.some(t => t.variant === "ink");
+  return (
+    <div style={{
+      position: "relative",
+      background: T.paper,
+      border: `1px solid ${isMilestone ? T.amber : T.border}`,
+      borderRadius: 8,
+      padding: "2rem",
+      overflow: "hidden",
+      transition: "box-shadow .2s, transform .2s",
+    }}
+      onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-2px)"; el.style.boxShadow = "0 8px 32px rgba(26,40,32,.1)"; }}
+      onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = ""; el.style.boxShadow = ""; }}
+    >
+      {/* Large watermark phase number */}
+      <div style={{ position: "absolute", top: -8, right: 16, ...serif, fontSize: "7rem", fontWeight: 700, color: T.border, lineHeight: 1, pointerEvents: "none", userSelect: "none" }}>
+        {phaseNum}
+      </div>
+
+      {/* Top row: phase label + milestone badge */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: ".75rem" }}>
+        <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".18em", textTransform: "uppercase", color: T.amber }}>
+          {item.phase}
+        </span>
+        {isMilestone && (
+          <span style={{ ...mono, fontSize: ".6rem", letterSpacing: ".1em", textTransform: "uppercase", padding: ".2rem .6rem", background: T.ink, color: T.paper, borderRadius: 3 }}>
+            Milestone
+          </span>
+        )}
+      </div>
+
+      {/* Title */}
+      <h3 style={{ ...serif, fontSize: "1.35rem", marginBottom: ".75rem", color: T.ink, lineHeight: 1.2, maxWidth: "85%" }}>
+        {item.title}
+      </h3>
+
+      {/* Body */}
+      <p style={{ ...body, color: T.textDim, fontSize: ".9rem", lineHeight: 1.7, marginBottom: "1.25rem" }}>
+        {item.body}
+      </p>
+
+      {/* Tags */}
+      <Tags items={item.tags} />
+
+      {/* Link button */}
+      {item.link && (
+        <a
+          href={item.link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: "1.25rem",
+            padding: ".75rem 1rem",
+            background: T.cream,
+            border: `1px solid ${T.border}`,
+            borderRadius: 4,
+            textDecoration: "none",
+            transition: "background .15s, border-color .15s",
+          }}
+          onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = T.paper2; el.style.borderColor = T.amber; }}
+          onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = T.cream; el.style.borderColor = T.border; }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: ".6rem", minWidth: 0 }}>
+            {/* Favicon */}
+            <img
+              src={`https://www.google.com/s2/favicons?domain=${new URL(item.link.href).hostname}&sz=32`}
+              alt=""
+              width={14} height={14}
+              style={{ borderRadius: 2, flexShrink: 0 }}
+              onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+            />
+            <span style={{ ...mono, fontSize: ".7rem", color: T.textDim, letterSpacing: ".04em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {item.link.label}
+            </span>
+          </div>
+          <span style={{ ...mono, fontSize: ".75rem", color: T.amber, flexShrink: 0, marginLeft: ".5rem" }}>↗</span>
+        </a>
+      )}
+    </div>
+  );
+}
+
 function Process() {
   return (
     <section id="process" style={{ padding: "7rem 0", borderBottom: `1px solid ${T.border}` }}>
       <SectionLabel n="01" label="Process" />
       <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: ".75rem", color: T.ink }}>Seven Months of Making</h2>
-      <p style={{ ...body, color: T.textDim, maxWidth: 620, marginBottom: "4rem" }}>
+      <p style={{ ...body, color: T.textDim, maxWidth: 620, marginBottom: "3rem" }}>
         The project went through five completely different directions before arriving at the final platform. Each pivot was driven by real feedback, real user data, or an honest moment of realizing I was solving the wrong problem.
       </p>
 
-      <div style={{ position: "relative", paddingLeft: "2rem" }}>
-        {/* vertical line */}
-        <div style={{ position: "absolute", left: 0, top: 8, bottom: 8, width: 1, background: `linear-gradient(to bottom, ${T.amber}, ${T.border}, transparent)` }} />
-
-        {TIMELINE_ITEMS.map((item) => (
-          <div key={item.title} style={{ position: "relative", marginBottom: "4rem" }}>
-            {/* dot */}
-            <div style={{ position: "absolute", left: "-2rem", top: 10, width: 7, height: 7, borderRadius: "50%", background: T.amber, boxShadow: `0 0 0 3px ${T.cream}, 0 0 0 4px ${T.amber}` }} />
-            <p style={{ ...mono, fontSize: ".68rem", letterSpacing: ".15em", textTransform: "uppercase", color: T.amber, marginBottom: ".4rem" }}>{item.phase}</p>
-            <h3 style={{ ...serif, fontSize: "1.5rem", marginBottom: ".75rem", color: T.ink }}>{item.title}</h3>
-            <p style={{ ...body, color: T.textDim, fontSize: ".95rem", maxWidth: 640, marginBottom: ".75rem" }}>{item.body}</p>
-            {item.link && (
-              <a href={item.link.href} target="_blank" rel="noopener noreferrer"
-                style={{ ...mono, fontSize: ".7rem", letterSpacing: ".08em", color: T.amber, textDecoration: "none", borderBottom: `1px solid rgba(200,133,44,.3)`, paddingBottom: ".1rem" }}>
-                {item.link.label} ↗
-              </a>
-            )}
-            <Tags items={item.tags} />
+      {/* Progress bar showing months */}
+      <div style={{ display: "flex", alignItems: "center", gap: ".5rem", marginBottom: "3rem", overflowX: "auto", paddingBottom: ".5rem" }}>
+        {["Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26"].map((m, i) => (
+          <div key={m} style={{ display: "flex", alignItems: "center", gap: ".5rem", flexShrink: 0 }}>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: i === 6 ? T.ink : T.amber, margin: "0 auto .3rem" }} />
+              <span style={{ ...mono, fontSize: ".6rem", color: T.textFaint, letterSpacing: ".06em" }}>{m}</span>
+            </div>
+            {i < 6 && <div style={{ width: 48, height: 1, background: `linear-gradient(to right, ${T.amber}, ${T.border})`, flexShrink: 0 }} />}
           </div>
+        ))}
+      </div>
+
+      {/* Cards grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "1.25rem" }}>
+        {TIMELINE_ITEMS.map((item, i) => (
+          <TimelineCard key={item.title} item={item} index={i} />
         ))}
       </div>
     </section>
