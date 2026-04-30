@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investigo — Capstone Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── Brand tokens (from logo exploration sheet) ── */
+:root {
+  --ink:      #1a2820;
+  --ink-2:    #243328;
+  --amber:    #c8852c;
+  --amber-lt: #e8a84a;
+  --paper:    #f5f0e8;
+  --paper-2:  #ede7d8;
+  --paper-3:  #e2dace;
+  --cream:    #faf7f2;
+  --text:     #1a2820;
+  --text-dim: #5a6b5e;
+  --text-faint:#8a9b8e;
+  --border:   rgba(26,40,32,.12);
+  --serif:    'Playfair Display', Georgia, serif;
+  --body:     'Lora', Georgia, serif;
+  --mono:     'DM Mono', monospace;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* subtle paper grain */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:0; opacity:.6;
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 3rem; height:64px;
+  background:rgba(245,240,232,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+
+.nav-logo {
+  display:flex; align-items:center; gap:.65rem;
+  text-decoration:none;
+}
+
+/* SVG mark inline */
+.nav-mark {
+  width:28px; height:28px; flex-shrink:0;
+}
+
+.nav-wordmark {
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:1.25rem;
+  color:var(--ink);
+  letter-spacing:-.01em;
+}
+
+.nav-links {
+  display:flex; gap:2rem; list-style:none;
+}
+.nav-links a {
+  font-family:var(--mono);
+  font-size:.72rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  text-decoration:none;
+  transition:color .2s;
+}
+.nav-links a:hover { color:var(--amber); }
+
+/* ── LAYOUT ── */
+section {
+  position:relative; z-index:1;
+  max-width:1080px;
+  margin:0 auto;
+  padding:7rem 3rem;
+}
+section + section {
+  border-top:1px solid var(--border);
+}
+
+.section-label {
+  font-family:var(--mono);
+  font-size:.68rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--amber);
+  margin-bottom:1.25rem;
+  display:flex; align-items:center; gap:.75rem;
+}
+.section-label::after {
+  content:'';
+  display:inline-block;
+  width:32px; height:1px;
+  background:var(--amber); opacity:.5;
+}
+
+h1,h2,h3 { font-family:var(--serif); font-weight:400; line-height:1.15; }
+
+/* ── HERO ── */
+#hero {
+  min-height:100vh;
+  display:flex; flex-direction:column; justify-content:center;
+  padding-top:80px;
+}
+
+.hero-eyebrow {
+  font-family:var(--mono);
+  font-size:.72rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin-bottom:1.5rem;
+  opacity:0;
+  animation:fadeUp .8s .15s forwards;
+}
+
+.hero-title {
+  font-family:var(--serif);
+  font-size:clamp(3.5rem,7vw,6rem);
+  font-style:italic;
+  line-height:1.02;
+  margin-bottom:.5rem;
+  opacity:0;
+  animation:fadeUp .9s .3s forwards;
+}
+
+.hero-title span { color:var(--amber); font-style:normal; }
+
+.hero-tagline {
+  font-family:var(--mono);
+  font-size:.85rem;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  margin-bottom:2rem;
+  opacity:0;
+  animation:fadeUp .8s .45s forwards;
+}
+
+.hero-desc {
+  font-size:1.1rem;
+  color:var(--text-dim);
+  max-width:560px;
+  margin-bottom:2.5rem;
+  opacity:0;
+  animation:fadeUp .8s .6s forwards;
+}
+
+.hero-meta {
+  font-family:var(--mono);
+  font-size:.75rem;
+  color:var(--text-faint);
+  letter-spacing:.06em;
+  margin-bottom:2.5rem;
+  opacity:0;
+  animation:fadeUp .8s .7s forwards;
+}
+
+.hero-cta {
+  display:flex; gap:1rem; flex-wrap:wrap;
+  opacity:0;
+  animation:fadeUp .8s .85s forwards;
+}
+
+.btn {
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.75rem 1.75rem;
+  font-family:var(--mono);
+  font-size:.75rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  text-decoration:none;
+  border-radius:3px;
+  transition:all .2s;
+  cursor:pointer; border:none;
+}
+.btn-ink {
+  background:var(--ink); color:var(--paper);
+}
+.btn-ink:hover { background:var(--ink-2); transform:translateY(-1px); }
+
+.btn-outline {
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text-dim);
+}
+.btn-outline:hover { border-color:var(--amber); color:var(--amber); }
+
+/* hero decorative mark */
+.hero-mark {
+  position:absolute;
+  right:3rem; top:50%;
+  transform:translateY(-50%);
+  width:280px; height:280px;
+  opacity:.06;
+  pointer-events:none;
+}
+
+/* stat pills */
+.hero-stats {
+  display:flex; flex-wrap:wrap; gap:.75rem;
+  margin-bottom:2.5rem;
+  opacity:0;
+  animation:fadeUp .8s .75s forwards;
+}
+.stat-pill {
+  background:var(--paper-2);
+  border:1px solid var(--border);
+  border-radius:100px;
+  padding:.35rem 1rem;
+  font-family:var(--mono);
+  font-size:.72rem;
+  color:var(--text-dim);
+}
+.stat-pill strong { color:var(--ink); }
+
+/* ── OVERVIEW STATS ── */
+.stats-row {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:6px;
+  overflow:hidden;
+  margin:3rem 0;
+}
+.stat-box {
+  background:var(--paper);
+  padding:2rem 1.5rem;
+}
+.stat-num {
+  font-family:var(--serif);
+  font-size:3rem;
+  line-height:1;
+  margin-bottom:.3rem;
+  color:var(--ink);
+}
+.stat-num.amber { color:var(--amber); }
+.stat-lbl {
+  font-family:var(--mono);
+  font-size:.68rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+}
+
+/* ── TIMELINE ── */
+.timeline { position:relative; padding-left:2rem; }
+.timeline::before {
+  content:'';
+  position:absolute; left:0; top:8px; bottom:8px;
+  width:1px;
+  background:linear-gradient(to bottom, var(--amber), var(--border), transparent);
+}
+
+.tl-item {
+  position:relative;
+  margin-bottom:4rem;
+}
+.tl-item::before {
+  content:'';
+  position:absolute; left:-2rem; top:10px;
+  width:7px; height:7px;
+  border-radius:50%;
+  background:var(--amber);
+  box-shadow:0 0 0 3px var(--cream), 0 0 0 4px var(--amber);
+}
+
+.tl-phase {
+  font-family:var(--mono);
+  font-size:.68rem;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--amber);
+  margin-bottom:.4rem;
+}
+
+.tl-title {
+  font-family:var(--serif);
+  font-size:1.5rem;
+  margin-bottom:.75rem;
+}
+
+.tl-body {
+  color:var(--text-dim);
+  font-size:.95rem;
+  max-width:640px;
+  margin-bottom:1rem;
+}
+
+.tl-link {
+  display:inline-flex; align-items:center; gap:.4rem;
+  font-family:var(--mono);
+  font-size:.7rem;
+  letter-spacing:.08em;
+  color:var(--amber);
+  text-decoration:none;
+  border-bottom:1px solid rgba(200,133,44,.3);
+  padding-bottom:.1rem;
+  transition:all .2s;
+}
+.tl-link:hover { color:var(--ink); border-color:var(--ink); }
+.tl-link::after { content:'↗'; font-size:.65rem; }
+
+.tl-tags {
+  display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.75rem;
+}
+.tag {
+  font-family:var(--mono);
+  font-size:.65rem;
+  letter-spacing:.06em;
+  padding:.2rem .65rem;
+  border-radius:100px;
+  border:1px solid var(--border);
+  color:var(--text-faint);
+}
+.tag-amber { border-color:rgba(200,133,44,.35); color:var(--amber); }
+.tag-ink   { border-color:rgba(26,40,32,.3); color:var(--ink); }
+
+/* ── PRECEDENTS ── */
+.prec-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1.5rem;
+  margin-top:2.5rem;
+}
+.prec-card {
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:2rem;
+  transition:border-color .2s, transform .2s;
+}
+.prec-card:hover { border-color:rgba(200,133,44,.4); transform:translateY(-2px); }
+
+.prec-year {
+  font-family:var(--mono);
+  font-size:.65rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin-bottom:.5rem;
+}
+.prec-name {
+  font-family:var(--serif);
+  font-size:1.3rem;
+  margin-bottom:.6rem;
+}
+.prec-body { font-size:.875rem; color:var(--text-dim); margin-bottom:1rem; }
+.prec-lesson {
+  font-size:.85rem;
+  font-style:italic;
+  color:var(--amber);
+  padding-top:.75rem;
+  border-top:1px solid var(--border);
+}
+
+/* ── INTERVIEW CARDS ── */
+.interview-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.25rem;
+  margin-top:2rem;
+}
+.interview-card {
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:1.75rem;
+}
+.int-initial {
+  width:44px; height:44px;
+  border-radius:50%;
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--serif);
+  font-size:1.1rem;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:1rem;
+}
+.int-name { font-family:var(--serif); font-size:1.1rem; margin-bottom:.15rem; }
+.int-role { font-family:var(--mono); font-size:.65rem; color:var(--text-faint); letter-spacing:.06em; margin-bottom:.75rem; }
+.int-body { font-size:.85rem; color:var(--text-dim); }
+
+/* ── FINDINGS ── */
+.findings { display:grid; gap:1rem; margin-top:2rem; }
+.finding {
+  display:grid; grid-template-columns:3rem 1fr; gap:1.25rem;
+  align-items:start;
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:1.5rem;
+}
+.find-icon {
+  width:3rem; height:3rem;
+  border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem;
+  flex-shrink:0;
+}
+.find-icon.good    { background:rgba(200,133,44,.1); }
+.find-icon.bad     { background:rgba(26,40,32,.07); }
+.find-icon.insight { background:rgba(200,133,44,.07); }
+
+.find-title { font-weight:600; font-size:.9rem; margin-bottom:.3rem; font-family:var(--serif); }
+.find-body  { font-size:.85rem; color:var(--text-dim); }
+
+blockquote.pull {
+  border-left:3px solid var(--amber);
+  padding:1rem 1.5rem;
+  margin:1.5rem 0;
+  background:rgba(200,133,44,.05);
+  border-radius:0 6px 6px 0;
+  font-style:italic;
+  font-size:1rem;
+  color:var(--ink);
+}
+blockquote.pull cite {
+  display:block;
+  font-size:.75rem;
+  color:var(--text-faint);
+  font-style:normal;
+  font-family:var(--mono);
+  margin-top:.5rem;
+  letter-spacing:.04em;
+}
+
+/* ── PLATFORM SCREENS ── */
+.screens-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1.5rem;
+  margin-top:2.5rem;
+}
+.screen-card {
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+  background:var(--paper);
+}
+.screen-preview {
+  width:100%; aspect-ratio:16/9;
+  background:#1a2820;
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+}
+/* simulated UI in each preview */
+.screen-preview::after {
+  content:'';
+  position:absolute;
+  bottom:18%; left:8%; right:8%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#c8852c,transparent);
+  opacity:.4;
+}
+.sp-inner { position:absolute; inset:0; padding:.85rem 1rem; }
+.sp-nav {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:.6rem;
+}
+.sp-logo { font-family:var(--mono); font-size:.45rem; color:#c8852c; letter-spacing:.1em; }
+.sp-cta  { width:30px; height:12px; background:#c8852c; border-radius:100px; }
+
+.sp-h { font-family:var(--serif); font-style:italic; font-size:.75rem; color:#f5f0e8; margin-bottom:.25rem; }
+.sp-sub { font-size:.45rem; color:rgba(245,240,232,.5); margin-bottom:.5rem; font-family:var(--mono); }
+
+.sp-chart {
+  display:flex; align-items:flex-end; gap:2px; height:28px;
+}
+.sp-bar { flex:1; border-radius:1px 1px 0 0; background:#c8852c; opacity:.45; }
+
+.sp-badge {
+  display:inline-block;
+  padding:.12rem .4rem;
+  background:rgba(200,133,44,.15);
+  border:1px solid rgba(200,133,44,.3);
+  border-radius:100px;
+  font-family:var(--mono);
+  font-size:.45rem;
+  color:#c8852c;
+  margin-top:.3rem;
+}
+
+.sp-row { display:flex; gap:.3rem; margin:.3rem 0; }
+.sp-pill {
+  padding:.1rem .35rem;
+  border-radius:3px;
+  font-family:var(--mono);
+  font-size:.42rem;
+}
+.sp-green { background:rgba(0,200,100,.15); color:#00c864; border:1px solid rgba(0,200,100,.25); }
+.sp-red   { background:rgba(220,50,50,.12); color:#e05050; border:1px solid rgba(220,50,50,.2); }
+.sp-amber { background:rgba(200,133,44,.15); color:#c8852c; border:1px solid rgba(200,133,44,.25); }
+.sp-news  { font-family:var(--mono); font-size:.42rem; color:rgba(245,240,232,.5); padding:.25rem .4rem; background:rgba(220,50,50,.08); border-left:1px solid rgba(220,50,50,.3); margin-top:.3rem; }
+
+.screen-meta { padding:1.1rem 1.25rem; }
+.screen-meta h4 { font-family:var(--serif); font-size:1rem; margin-bottom:.25rem; }
+.screen-meta p  { font-size:.82rem; color:var(--text-dim); }
+
+/* ── DESIGN SYSTEM SWATCHES ── */
+.swatch-row { display:flex; gap:1.25rem; flex-wrap:wrap; margin-top:1.75rem; }
+.swatch { display:flex; flex-direction:column; align-items:center; gap:.5rem; }
+.swatch-dot { width:52px; height:52px; border-radius:8px; border:1px solid rgba(0,0,0,.08); }
+.swatch-name { font-family:var(--mono); font-size:.65rem; color:var(--text-dim); }
+.swatch-hex  { font-family:var(--mono); font-size:.6rem; color:var(--text-faint); }
+
+/* ── FUTURE CARDS ── */
+.future-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.25rem;
+  margin-top:2.5rem;
+}
+.future-card {
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:1.5rem;
+  transition:border-color .2s;
+}
+.future-card:hover { border-color:rgba(200,133,44,.4); }
+.future-num {
+  font-family:var(--serif);
+  font-size:2.5rem;
+  color:var(--paper-3);
+  line-height:1;
+  margin-bottom:.75rem;
+}
+.future-title { font-family:var(--serif); font-size:1rem; margin-bottom:.4rem; }
+.future-body  { font-size:.82rem; color:var(--text-dim); }
+
+/* ── TABLE ── */
+.data-table {
+  width:100%; border-collapse:collapse;
+  margin-top:2rem; font-size:.875rem;
+}
+.data-table th {
+  background:var(--paper-2);
+  color:var(--text-faint);
+  font-family:var(--mono);
+  font-size:.68rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:.75rem 1rem;
+  text-align:left;
+  border-bottom:1px solid var(--border);
+  font-weight:400;
+}
+.data-table td {
+  padding:.75rem 1rem;
+  border-bottom:1px solid rgba(26,40,32,.05);
+  color:var(--text-dim);
+}
+.data-table tr:last-child td { border-bottom:none; font-weight:500; color:var(--ink); }
+.data-table td:first-child { font-family:var(--mono); color:var(--amber); }
+.data-table td.green { color:#2a7a4a; font-family:var(--mono); }
+
+/* ── REFLECTIONS ── */
+.reflect-body {
+  max-width:680px;
+}
+.reflect-body p {
+  color:var(--text-dim);
+  margin-bottom:1.5rem;
+  font-size:.975rem;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top:1px solid var(--border);
+  padding:3rem;
+  max-width:1080px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:2rem;
+  align-items:end;
+  position:relative; z-index:1;
+}
+.footer-logo {
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:1.5rem;
+  color:var(--ink);
+  margin-bottom:.4rem;
+}
+.footer-meta { font-family:var(--mono); font-size:.7rem; color:var(--text-faint); letter-spacing:.04em; }
+.footer-links { display:flex; gap:1.5rem; }
+.footer-links a {
+  font-family:var(--mono);
+  font-size:.72rem;
+  letter-spacing:.06em;
+  color:var(--text-dim);
+  text-decoration:none;
+  transition:color .2s;
+}
+.footer-links a:hover { color:var(--amber); }
+
+/* ── REVEAL ── */
+.reveal {
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity .65s, transform .65s;
+}
+.reveal.visible { opacity:1; transform:none; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:none; }
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:800px){
+  nav { padding:0 1.25rem; }
+  .nav-links { display:none; }
+  section { padding:5rem 1.25rem; }
+  .stats-row { grid-template-columns:repeat(2,1fr); }
+  .prec-grid, .screens-grid { grid-template-columns:1fr; }
+  .interview-grid { grid-template-columns:1fr; }
+  .future-grid { grid-template-columns:1fr 1fr; }
+  footer { grid-template-columns:1fr; }
+  .footer-links { justify-content:flex-start; }
+  .hero-mark { display:none; }
+}
+@media(max-width:500px){
+  .future-grid { grid-template-columns:1fr; }
+}
+
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:var(--cream); }
+::-webkit-scrollbar-thumb { background:var(--paper-3); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a class="nav-logo" href="#hero">
+    <!-- Magnifying glass + candlestick mark, SVG inline -->
+    <svg class="nav-mark" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="9" stroke="#1a2820" stroke-width="2"/>
+      <line x1="19" y1="19" x2="26" y2="26" stroke="#1a2820" stroke-width="2.2" stroke-linecap="round"/>
+      <rect x="10" y="8" width="4" height="8" rx=".8" fill="#c8852c"/>
+      <line x1="12" y1="6" x2="12" y2="8" stroke="#c8852c" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="12" y1="16" x2="12" y2="18" stroke="#c8852c" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-wordmark">Investigo</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#platform">Platform</a></li>
+    <li><a href="#testing">Testing</a></li>
+    <li><a href="#reflection">Reflection</a></li>
+    <li><a href="#next">Next</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <!-- decorative large mark -->
+  <svg class="hero-mark" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="120" cy="120" r="100" stroke="#1a2820" stroke-width="8"/>
+    <line x1="198" y1="198" x2="272" y2="272" stroke="#1a2820" stroke-width="10" stroke-linecap="round"/>
+    <rect x="96" y="72" width="48" height="96" rx="6" fill="#c8852c"/>
+    <line x1="120" y1="44" x2="120" y2="72" stroke="#c8852c" stroke-width="10" stroke-linecap="round"/>
+    <line x1="120" y1="168" x2="120" y2="196" stroke="#c8852c" stroke-width="10" stroke-linecap="round"/>
+  </svg>
+
+  <p class="hero-eyebrow">Interactive Media Capstone · NYU · 2025–2026</p>
+  <h1 class="hero-title">Investigo<span>.</span></h1>
+  <p class="hero-tagline">Track · Trace · Invest</p>
+  <p class="hero-desc">A gamified financial literacy platform built for a generation that invests on hype. This is the full archive of how it was made — seven months, five prototypes, twelve user tests, and one complete rebuild.</p>
+  <p class="hero-meta">Mohidul Alam &nbsp;·&nbsp; Advisors: Jack B Du, Aaron Sherwood &nbsp;·&nbsp; April 2026</p>
+
+  <div class="hero-stats">
+    <div class="stat-pill"><strong>5</strong> Prototypes</div>
+    <div class="stat-pill"><strong>3</strong> User Interviews</div>
+    <div class="stat-pill"><strong>12</strong> Testing Sessions</div>
+    <div class="stat-pill"><strong>50</strong> Lessons</div>
+    <div class="stat-pill"><strong>130+</strong> Assets Simulated</div>
+    <div class="stat-pill"><strong>2020–2026</strong> Historical Range</div>
+  </div>
+
+  <div class="hero-cta">
+    <a class="btn btn-ink" href="https://im-projext.vercel.app" target="_blank">View Live Platform ↗</a>
+    <a class="btn btn-outline" href="#process">Explore Process ↓</a>
+  </div>
+</section>
+
+<!-- ── OVERVIEW ── -->
+<section id="overview">
+  <p class="section-label">00 — Overview</p>
+  <h2 class="reveal" style="font-size:2.5rem;margin-bottom:1.5rem;">What is Investigo?</h2>
+  <p class="reveal" style="color:var(--text-dim);max-width:680px;font-size:1.05rem;margin-bottom:1rem;">
+    Investigo is a web-based gamified financial literacy platform. The name pairs <em>invest</em> with the Latin <em>investigo</em> — to track, to trace, to pursue evidence with deliberate attention. It combines a 60-day curriculum, a historically accurate market simulator, a knowledge-gated earn-to-invest mechanic, and a personalized analytics dashboard.
+  </p>
+  <p class="reveal" style="color:var(--text-dim);max-width:680px;font-size:1.05rem;">
+    The central argument: the crisis of hype-driven investing is a design problem. The solution is a platform where the architecture itself enforces the lesson — <strong style="color:var(--ink)">you cannot invest until you have demonstrated you understand what you are investing in.</strong>
+  </p>
+
+  <div class="stats-row reveal">
+    <div class="stat-box">
+      <div class="stat-num amber">50</div>
+      <div class="stat-lbl">Lessons across 5 units</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">60</div>
+      <div class="stat-lbl">Day structured curriculum</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num amber">130+</div>
+      <div class="stat-lbl">Assets in simulator</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">12</div>
+      <div class="stat-lbl">Remote user testing sessions</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROCESS ── -->
+<section id="process">
+  <p class="section-label">01 — Process</p>
+  <h2 class="reveal" style="font-size:2.5rem;margin-bottom:.75rem;">Seven Months of Making</h2>
+  <p class="reveal" style="color:var(--text-dim);max-width:620px;margin-bottom:4rem;">
+    The project went through five completely different directions before arriving at the final platform. Each pivot was driven by real feedback, real user data, or an honest moment of realizing I was solving the wrong problem.
+  </p>
+
+  <div class="timeline">
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">October 2025 — Phase 1</div>
+      <div class="tl-title">Finding the Problem</div>
+      <div class="tl-body">
+        The earliest direction was broad: playful finance, gamified, accessible to beginners. Advisors pushed me to research before building — identify the audience, conduct interviews, write a UX paper. I was thinking about financial literacy in emerging markets and about making investing feel less like a spreadsheet and more like something human. Goals: 5 user interviews, competitive analysis, define the audience.
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-amber">Research</span>
+        <span class="tag">Competitive Analysis</span>
+        <span class="tag">Audience Definition</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">Early November 2025 — Phase 2</div>
+      <div class="tl-title">Prototype 1 — Stock Seer</div>
+      <div class="tl-body">
+        First working prototype: a DCF (Discounted Cash Flow) valuation tool. Type in a company name, get a verdict — undervalued, overvalued, or fairly priced. Built on Lovable with static data. The idea came from my VC background: valuation logic is always hidden in spreadsheets. I wanted to make it visible and teachable. What I learned: simplicity builds trust. But it had a ceiling — it was a calculator, not a learning platform.
+      </div>
+      <a class="tl-link" href="https://preview--stock-seer-valuator.lovable.app/" target="_blank">preview--stock-seer-valuator.lovable.app</a>
+      <div class="tl-tags">
+        <span class="tag tag-amber">Prototype 1</span>
+        <span class="tag">Lovable</span>
+        <span class="tag">DCF Model</span>
+        <span class="tag">Static Data</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">Mid November 2025 — Phase 3</div>
+      <div class="tl-title">Prototype 2 — Early Alpha Finder</div>
+      <div class="tl-body">
+        After in-class feedback I ran a "5 alternative meanings" exercise and pivoted. Stock Seer became an Early Alpha Finder — a tool to spot undervalued companies before Wall Street notices. Added an Alpha Score, Hidden Compounders watchlist, Catalyst Timeline, and Scenario Modeling. The framing shifted from "understand valuations" to "build wealth." It felt more exciting. It also felt like I was solving the wrong problem.
+      </div>
+      <a class="tl-link" href="https://hidden-compounders.lovable.app/" target="_blank">hidden-compounders.lovable.app</a>
+      <div class="tl-tags">
+        <span class="tag tag-amber">Prototype 2</span>
+        <span class="tag">Alpha Score</span>
+        <span class="tag">Watchlist</span>
+        <span class="tag">Scenario Modeling</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">Late November 2025 — Phase 4</div>
+      <div class="tl-title">Prototype 3 — Calm Money Jars</div>
+      <div class="tl-body">
+        I ran the "Why?" process again and hit something uncomfortable: even if you pick the right stocks, bad money management destroys you. Alpha without allocation is fragile. People panic-sell, over-invest, forget about liquidity. So I pivoted completely — away from stock picking into money management. Three jars: Now (bills, emergencies), Soon (mid-term goals), Later (long-term compounding). Gentle nudges, drawdown guardrails, savings funnels. The most counterintuitive prototype — and the most useful design lesson.
+      </div>
+      <a class="tl-link" href="https://calm-money-jars.lovable.app/" target="_blank">calm-money-jars.lovable.app</a>
+      <div class="tl-tags">
+        <span class="tag tag-amber">Prototype 3</span>
+        <span class="tag">Money Management</span>
+        <span class="tag">Behavioral Design</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">Early December 2025 — Phase 5</div>
+      <div class="tl-title">Prototype 4 — Flip & Fun</div>
+      <div class="tl-body">
+        The assignment: break your own idea. I ran two exercises. Reversal: flipped Calm Money Jars into "Stress Seer" — scary alerts, doomsday what-if scenarios. Random stimulation: random word was "Garden." Built a Money Garden where dollars are seeds, Now money grows like herbs, Later money grows like oak trees. The lesson: finance apps don't have to look like spreadsheets. They can be emotional, visual, even strange — that's what makes them stick. This thinking directly influenced Investigo's final design.
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-amber">Prototype 4</span>
+        <span class="tag">Reversal Method</span>
+        <span class="tag">Random Stimulation</span>
+        <span class="tag">Conceptual Exploration</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">November–December 2025 — Phase 6</div>
+      <div class="tl-title">User Research — Three Interviews</div>
+      <div class="tl-body">
+        My advisor pushed me to stop building and listen properly. Three formal user interviews — the most important week of the semester. Kashpia (25, product manager): wants micro-learning, no jargon, human and habit-forming. Atiq (22, engineering student, invests $100/month): wants chat, not courses — personalized to his exact situation. Faisal (CS student): wants a sandbox, not a curriculum — learn by changing variables and seeing results. Three people. Three completely different mental models. All three pushed the project in useful directions.
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-amber">User Research</span>
+        <span class="tag">3 Interviews</span>
+        <span class="tag">Mental Models</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">After Midterm, December 2025 — Phase 7</div>
+      <div class="tl-title">The Big Pivot — Duolingo for Stock Trading</div>
+      <div class="tl-body">
+        Threw out everything. Built a "Duolingo for Stock Trading" on Replit over a weekend: 25 interactive lessons, leaderboard, profiles, quizzes, games. This was the moment the current project direction was born. Learning stock trading should feel as smooth and habit-forming as learning a language. New ideas surfaced fast — multiplayer trading battles, daily market missions, simulated investment challenges. The first prototype that felt like it could actually become something.
+      </div>
+      <a class="tl-link" href="https://stock-duel-ma7264.replit.app/" target="_blank">stock-duel-ma7264.replit.app</a>
+      <div class="tl-tags">
+        <span class="tag tag-amber">Major Pivot</span>
+        <span class="tag">Replit</span>
+        <span class="tag">25 Lessons</span>
+        <span class="tag">Gamification</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">Week 12, December 2025 — Phase 8</div>
+      <div class="tl-title">AI Agent Experiment</div>
+      <div class="tl-body">
+        The interviews pushed me toward something more conversational. Built a Chatbase AI agent trained on NVIDIA investor relations data — users learn through chat rather than structured lessons. This experiment didn't become the final product, but it gave me two things: clarity on where AI fits in financial education, and confirmation that the structured lesson approach was actually stronger than pure conversational AI for beginners.
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-amber">AI Experiment</span>
+        <span class="tag">Chatbase</span>
+        <span class="tag">NVIDIA IR Data</span>
+        <span class="tag">Conversational UI</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">January 22, 2026 — Phase 9</div>
+      <div class="tl-title">React Rebuild — Proper Codebase</div>
+      <div class="tl-body">
+        Advisor meeting. Feedback: "Very good app, gamified, fun — but it feels like a Duolingo replica. Create something people haven't seen before." Formal project objectives locked in: Duolingo for investments but distinctly its own thing, lessons with fake money tools, AI integration for hard concepts, milestone-based asset unlocking. Rebuilt from scratch in React — not Replit, not Lovable. A real codebase, pushed to GitHub, deployed to Vercel.
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-amber">React Rebuild</span>
+        <span class="tag">GitHub</span>
+        <span class="tag">Vercel</span>
+        <span class="tag tag-ink">Final Direction Set</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">February 2026 — Phase 10</div>
+      <div class="tl-title">Building the Learning Experience</div>
+      <div class="tl-body">
+        Deepest heads-down building period. Built the 50-lesson curriculum across 5 thematic units, flashcard and quiz system, the earn-to-invest mechanic, the historical simulator (Jan 2020–2026) with annotated news events at every major market moment, and the Deep Space Finance design system — a fully semantic dark-theme color palette. Deliberately excluded cryptocurrency: two catastrophic crash cycles would have taught the wrong lesson. Advisors arranged external panelists including Tammer Qaddumi (General Partner, VentureSouq).
+      </div>
+      <div class="tl-tags">
+        <span class="tag tag-amber">50 Lessons</span>
+        <span class="tag">Simulator Build</span>
+        <span class="tag">Design System</span>
+        <span class="tag">Earn-to-Invest</span>
+      </div>
+    </div>
+
+    <div class="tl-item reveal">
+      <div class="tl-phase">March–April 2026 — Phase 11</div>
+      <div class="tl-title">12 Remote User Testing Sessions</div>
+      <div class="tl-body">
+        All research was remote — course fully online. Twelve sessions across three rounds via Zoom and Google Meet, think-aloud protocol, structured debrief questions. Round 1 (4 sessions): early prototype, testing core navigation. Round 2 (4 sessions): curriculum and simulator integrated. Round 3 (4 sessions): near-complete platform, full flow from onboarding to analytics. Final advisor meeting April 9 — simplify mobile interface, reconsider tab naming.
+      </div>
+      <a class="tl-link" href="https://im-projext.vercel.app" target="_blank">im-projext.vercel.app (final platform)</a>
+      <div class="tl-tags">
+        <span class="tag tag-amber">12 Sessions</span>
+        <span class="tag">Think-Aloud Protocol</span>
+        <span class="tag">3 Rounds</span>
+        <span class="tag tag-ink">Final Platform</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── RESEARCH / PRECEDENTS ── -->
+<section id="research">
+  <p class="section-label">02 — Research</p>
+  <h2 class="reveal" style="font-size:2.5rem;margin-bottom:.75rem;">Precedents & Academic Grounding</h2>
+  <p class="reveal" style="color:var(--text-dim);max-width:620px;margin-bottom:.5rem;">
+    Four projects shaped the intellectual architecture of Investigo — each one teaching a specific lesson about what to build and what to avoid.
+  </p>
+
+  <div class="prec-grid">
+    <div class="prec-card reveal">
+      <div class="prec-year">SIFMA Foundation · 1977</div>
+      <div class="prec-name">The Stock Market Game</div>
+      <div class="prec-body">The longest-running financial simulation in American education, 4M+ students annually. Research confirms significantly greater financial knowledge gains over matched control groups (Mandell, 2009).</div>
+      <div class="prec-lesson">"Real stakes inside a safe container. I kept the principle, added the prerequisite curriculum that was missing."</div>
+    </div>
+    <div class="prec-card reveal">
+      <div class="prec-year">Luis von Ahn · 2011</div>
+      <div class="prec-name">Duolingo</div>
+      <div class="prec-body">500M+ users sustained by design, not willpower. Von Ahn's core insight: motivation — not content quality — is the binding constraint in self-directed education (von Ahn, 2013).</div>
+      <div class="prec-lesson">"The earn-to-invest mechanic is Duolingo's XP system — except the reward is investable capital, not a badge."</div>
+    </div>
+    <div class="prec-card reveal">
+      <div class="prec-year">UW Center for Game Science · 2008</div>
+      <div class="prec-name">Foldit</div>
+      <div class="prec-body">Players solved a 15-year-old HIV protein structure problem in 10 days. The team chose scientific accuracy over simplified gameplay — and it worked (Cooper et al., 2010).</div>
+      <div class="prec-lesson">"I simulated real historical price data, not randomized markets. The fidelity is the lesson."</div>
+    </div>
+    <div class="prec-card reveal">
+      <div class="prec-year">Investopedia · 2000s</div>
+      <div class="prec-name">Stock Simulator</div>
+      <div class="prec-body">Equity simulations improve knowledge scores by 42% on average (Moffit et al., 2010). But the simulator and education exist as entirely separate products — users can trade without reading anything.</div>
+      <div class="prec-lesson">"I inverted this completely: curriculum completion is the only path to the simulator."</div>
+    </div>
+  </div>
+
+  <!-- User interviews -->
+  <h3 class="reveal" style="font-size:1.6rem;margin:4rem 0 .5rem;font-family:var(--serif);">User Interviews</h3>
+  <p class="reveal" style="color:var(--text-dim);font-size:.9rem;max-width:560px;margin-bottom:.5rem;">Three formal interviews conducted November–December 2025. Each reshaped the project in a different direction.</p>
+
+  <div class="interview-grid">
+    <div class="interview-card reveal">
+      <div class="int-initial">K</div>
+      <div class="int-name">Kashpia, 25</div>
+      <div class="int-role">Product Manager · AI Startup · San Diego</div>
+      <div class="int-body">Confirmed the Duolingo-for-investing direction but demanded nuance. Bounces off investing content when jargon hits too fast. Wants micro-learning — 5–10 minutes, small wins, one concept at a time, human tone, real-life context. Shaped the entire pacing and voice of the final curriculum.</div>
+    </div>
+    <div class="interview-card reveal">
+      <div class="int-initial">A</div>
+      <div class="int-name">Atiq, 22</div>
+      <div class="int-role">Engineering Student · Invests $100/month</div>
+      <div class="int-body">Didn't want levels or courses — wanted chat. Learns by asking questions in his own words and getting answers that match his level and his specific situation. Said explanations should reference that he only invests $100/month. Introduced the personalization angle that became the analytics dashboard.</div>
+    </div>
+    <div class="interview-card reveal">
+      <div class="int-initial">F</div>
+      <div class="int-name">Faisal</div>
+      <div class="int-role">CS Student</div>
+      <div class="int-body">Didn't want chat or lessons — wanted a sandbox. Change variables, see results, test scenarios, learn through cause and effect. Thinks in systems. His feedback pushed the simulator toward higher fidelity and more interactive scenario framing at each historical event.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PLATFORM ── -->
+<section id="platform">
+  <p class="section-label">03 — Platform</p>
+  <h2 class="reveal" style="font-size:2.5rem;margin-bottom:.75rem;">What Was Built</h2>
+  <p class="reveal" style="color:var(--text-dim);max-width:680px;margin-bottom:1rem;">
+    The final platform — <strong>Investigo</strong> (also referred to as Nest during development) — brings together four interconnected systems built over February–April 2026.
+  </p>
+
+  <!-- Screens -->
+  <div class="screens-grid">
+    <div class="screen-card reveal">
+      <div class="screen-preview">
+        <div class="sp-inner">
+          <div class="sp-nav"><span class="sp-logo">INVESTIGO</span><div class="sp-cta"></div></div>
+          <div class="sp-h">Track. Learn. Invest.</div>
+          <div class="sp-sub">50 lessons · 130+ stocks · 2020–2026 · $0 real risk</div>
+          <div class="sp-chart">
+            <div class="sp-bar" style="height:35%"></div><div class="sp-bar" style="height:50%"></div>
+            <div class="sp-bar" style="height:28%"></div><div class="sp-bar" style="height:18%"></div>
+            <div class="sp-bar" style="height:40%"></div><div class="sp-bar" style="height:65%"></div>
+            <div class="sp-bar" style="height:82%"></div><div class="sp-bar" style="height:90%"></div>
+            <div class="sp-bar" style="height:72%"></div><div class="sp-bar" style="height:95%"></div>
+            <div class="sp-bar" style="height:100%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-meta">
+        <h4>Landing Page</h4>
+        <p>Hero with S&P 500 simulation chart annotated with COVID crash, meme stocks, Fed rate hikes, and AI rally.</p>
+      </div>
+    </div>
+
+    <div class="screen-card reveal">
+      <div class="screen-preview">
+        <div class="sp-inner">
+          <div class="sp-nav"><span class="sp-logo">Lesson 12 / 50</span><span style="font-family:var(--mono);font-size:.42rem;color:rgba(200,133,44,.7)">24% complete</span></div>
+          <div class="sp-h" style="font-size:.65rem;">What is an Index Fund?</div>
+          <div class="sp-sub">8 min read</div>
+          <div class="sp-badge">Virtual Wallet: $3,240</div>
+          <div style="margin-top:.5rem;display:flex;gap:3px;">
+            <div style="height:18px;width:30%;background:rgba(167,139,250,.2);border-radius:3px;"></div>
+            <div style="height:18px;width:18%;background:rgba(0,200,100,.12);border:1px solid rgba(0,200,100,.25);border-radius:3px;"></div>
+            <div style="height:18px;width:22%;background:rgba(200,133,44,.15);border:1px solid rgba(200,133,44,.25);border-radius:3px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-meta">
+        <h4>Lesson View</h4>
+        <p>Curriculum sidebar, virtual wallet balance, and earn-to-invest reward shown inline with content and quiz.</p>
+      </div>
+    </div>
+
+    <div class="screen-card reveal">
+      <div class="screen-preview">
+        <div class="sp-inner">
+          <div class="sp-nav"><span class="sp-logo">Markets</span><span style="font-family:var(--mono);font-size:.42rem;color:#c8852c">Mar 15, 2022</span></div>
+          <div class="sp-row">
+            <span class="sp-pill sp-green">+88.2%</span>
+            <span class="sp-pill sp-amber">$8,912</span>
+            <span class="sp-pill" style="background:rgba(245,240,232,.06);color:rgba(245,240,232,.5);font-family:var(--mono);font-size:.42rem;border:1px solid rgba(255,255,255,.08);">1hr = 1 month</span>
+          </div>
+          <div class="sp-news">Fed raises rates 0.25% — first since 2018. Markets react with volatility.</div>
+          <div style="margin-top:.4rem;display:flex;gap:3px;align-items:flex-end;height:22px;">
+            <div style="flex:1;height:60%;background:#c8852c;opacity:.35;border-radius:1px;"></div>
+            <div style="flex:1;height:40%;background:#c8852c;opacity:.35;border-radius:1px;"></div>
+            <div style="flex:1;height:80%;background:#c8852c;opacity:.35;border-radius:1px;"></div>
+            <div style="flex:1;height:30%;background:#e05050;opacity:.35;border-radius:1px;"></div>
+            <div style="flex:1;height:55%;background:#c8852c;opacity:.35;border-radius:1px;"></div>
+            <div style="flex:1;height:70%;background:#c8852c;opacity:.35;border-radius:1px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-meta">
+        <h4>Trading Simulator</h4>
+        <p>Real historical data 2020–2026. Annotated news events, P&L tracking, open positions, trade history.</p>
+      </div>
+    </div>
+
+    <div class="screen-card reveal">
+      <div class="screen-preview">
+        <div class="sp-inner">
+          <div class="sp-nav"><span class="sp-logo">Analytics</span><span style="font-family:var(--mono);font-size:.42rem;color:#c8852c">Score: 74/100</span></div>
+          <div class="sp-row">
+            <span class="sp-pill sp-green">Win Rate 68%</span>
+            <span class="sp-pill sp-amber">+88% return</span>
+          </div>
+          <div style="margin:.35rem 0;font-family:var(--mono);font-size:.45rem;padding:.2rem .4rem;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.25);border-radius:3px;color:#a78bfa;display:inline-block;">Growth Investor</div>
+          <div style="margin-top:.4rem;display:flex;gap:3px;align-items:flex-end;height:22px;">
+            <div style="flex:1;height:80%;background:#c8852c;opacity:.4;border-radius:1px;"></div>
+            <div style="flex:1;height:55%;background:#00c864;opacity:.35;border-radius:1px;"></div>
+            <div style="flex:1;height:65%;background:#c8852c;opacity:.4;border-radius:1px;"></div>
+            <div style="flex:1;height:42%;background:#e05050;opacity:.35;border-radius:1px;"></div>
+            <div style="flex:1;height:76%;background:#c8852c;opacity:.4;border-radius:1px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-meta">
+        <h4>Analytics Dashboard</h4>
+        <p>Investor type classification, behavioral radar, buy/sell timing scores, and personalized insight cards.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design System -->
+  <h3 class="reveal" style="font-size:1.5rem;margin:4rem 0 .5rem;font-family:var(--serif);">Design System — Deep Space Finance</h3>
+  <p class="reveal" style="color:var(--text-dim);font-size:.9rem;max-width:560px;margin-bottom:.5rem;">Every color token carries a specific meaning consistent throughout every screen. A learner reads the emotional state of their portfolio without reading a single number.</p>
+
+  <div class="swatch-row reveal">
+    <div class="swatch"><div class="swatch-dot" style="background:#00C2FF;"></div><div class="swatch-name">Cyan</div><div class="swatch-hex">#00C2FF · Action</div></div>
+    <div class="swatch"><div class="swatch-dot" style="background:#00E5A0;"></div><div class="swatch-name">Emerald</div><div class="swatch-hex">#00E5A0 · Profit</div></div>
+    <div class="swatch"><div class="swatch-dot" style="background:#FFB800;"></div><div class="swatch-name">Amber</div><div class="swatch-hex">#FFB800 · Rewards</div></div>
+    <div class="swatch"><div class="swatch-dot" style="background:#FF3B5C;"></div><div class="swatch-name">Crimson</div><div class="swatch-hex">#FF3B5C · Loss</div></div>
+    <div class="swatch"><div class="swatch-dot" style="background:#A78BFA;"></div><div class="swatch-name">Violet</div><div class="swatch-hex">#A78BFA · Education</div></div>
+    <div class="swatch"><div class="swatch-dot" style="background:#0A1228;border-color:rgba(0,0,0,.2);"></div><div class="swatch-name">Navy Deep</div><div class="swatch-hex">#0A1228 · Background</div></div>
+  </div>
+
+  <!-- Earn-to-Invest table -->
+  <h3 class="reveal" style="font-size:1.5rem;margin:4rem 0 .5rem;font-family:var(--serif);">Earn-to-Invest Reward Structure</h3>
+  <p class="reveal" style="color:var(--text-dim);font-size:.9rem;max-width:560px;">You start with zero capital. Every quiz pass earns virtual currency. That currency is the only way to fund trades. Learning unlocks earning. Earning unlocks action.</p>
+
+  <table class="data-table reveal">
+    <thead>
+      <tr>
+        <th>Lessons</th>
+        <th>Topic Area</th>
+        <th>Reward (Perfect)</th>
+        <th>Assets Unlocked</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1–10</td><td>Foundations: stocks, markets, exchanges</td><td class="green">$100–$200</td><td>SPY, VTI</td></tr>
+      <tr><td>11–20</td><td>Funds: index, ETF, mutual</td><td class="green">$200–$300</td><td>QQQ, IWM</td></tr>
+      <tr><td>21–30</td><td>Portfolio strategy &amp; diversification</td><td class="green">$300–$400</td><td>Sector ETFs</td></tr>
+      <tr><td>31–40</td><td>Risk, technicals, macroeconomics</td><td class="green">$400–$500</td><td>Individual equities</td></tr>
+      <tr><td>41–50</td><td>Behavioral finance &amp; psychology</td><td class="green">$500–$600</td><td>Full 130+ universe</td></tr>
+      <tr><td>Total</td><td>All 50 lessons, perfect scores</td><td>~$15,000</td><td>130+ assets</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── TESTING ── -->
+<section id="testing">
+  <p class="section-label">04 — User Testing</p>
+  <h2 class="reveal" style="font-size:2.5rem;margin-bottom:.75rem;">12 Remote Sessions</h2>
+  <p class="reveal" style="color:var(--text-dim);max-width:660px;margin-bottom:2rem;">
+    All sessions were remote — the course was fully online. Zoom and Google Meet, think-aloud protocol, structured debrief questions. Three rounds across the semester: early, mid-stage, and near-final.
+  </p>
+
+  <div class="findings">
+
+    <div class="finding reveal">
+      <div class="find-icon good">✓</div>
+      <div>
+        <div class="find-title">The simulator's emotional power confirmed</div>
+        <div class="find-body">Multiple participants — including self-described experienced investors — sold during the COVID crash sequence, locked in losses, then watched the market recover past their entry point in the same session. The experiential lesson landed in a way no reading could replicate.</div>
+      </div>
+    </div>
+
+    <blockquote class="pull reveal">
+      "Oh. That is what people mean when they say do not sell the bottom."
+      <cite>— Participant, 24, 2 years on Robinhood</cite>
+    </blockquote>
+
+    <div class="finding reveal">
+      <div class="find-icon bad">⚠</div>
+      <div>
+        <div class="find-title">Curriculum completion friction — 6 of 12 testers</div>
+        <div class="find-body">Users with prior investing knowledge were frustrated by foundational lessons before simulator access. The mechanic is architecturally correct but creates real friction for users who arrive with prior knowledge. Resolution in development: a placement assessment at onboarding.</div>
+      </div>
+    </div>
+
+    <blockquote class="pull reveal">
+      "I know what a stock is. I do not need a lesson on what a stock is before I can practice buying one."
+      <cite>— Participant, Robinhood user, 2 years experience</cite>
+    </blockquote>
+
+    <div class="finding reveal">
+      <div class="find-icon insight">◈</div>
+      <div>
+        <div class="find-title">Investor identity resonates more than instruction</div>
+        <div class="find-body">Participants across all skill levels paused to study their analytics results. Several asked to screenshot their investor type classification. Being told what kind of investor you are — based on your own decisions — resonated far more than any explicit lesson content.</div>
+      </div>
+    </div>
+
+    <div class="finding reveal">
+      <div class="find-icon bad">↗</div>
+      <div>
+        <div class="find-title">Mobile responsiveness broken — top complaint from walkthrough</div>
+        <div class="find-body">Almost everyone tried the demo on their phone. Elements overlapped, buttons pushed off-screen, scrolling unpredictable, app freezing. The concept is meant to be mobile-accessible. This became the immediate top priority for fixes after the walkthrough.</div>
+      </div>
+    </div>
+
+    <div class="finding reveal">
+      <div class="find-icon good">+</div>
+      <div>
+        <div class="find-title">XP gates and Daily Wisdom AI got strong positive response</div>
+        <div class="find-body">The lesson → XP → unlocked assets loop felt motivating and intuitive to most testers. The Gemini-powered Daily Wisdom AI mentor was noted for how calm and non-trading-app-like it felt — a deliberate design choice validated by real users.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── REFLECTION ── -->
+<section id="reflection">
+  <p class="section-label">05 — Reflection</p>
+  <h2 class="reveal" style="font-size:2.5rem;margin-bottom:2rem;">What Building This Taught Me</h2>
+
+  <div class="reflect-body">
+    <p class="reveal">
+      Seven months of building Investigo taught me things I could not have learned by reading about them — which is appropriately on-theme for a project about experiential learning. The most important discovery was how emotionally powerful the simulator became. I designed it as an educational tool. In practice it functioned as something closer to a mirror.
+    </p>
+    <p class="reveal">
+      The most humbling: six of twelve testers hit friction I designed into the system deliberately. The earn-to-invest mechanic is architecturally correct — and it annoyed half my test group. Good design and correct design are not always the same thing. The placement assessment I am now building is not a workaround. It is the design becoming more honest about who actually shows up.
+    </p>
+    <p class="reveal">
+      The most useful lesson from the early prototypes: the Calm Money Jars pivot in Prototype 3 forced me to think about what investing education is actually for. Not picking winners. Surviving long enough to benefit when you do. That reframing lives inside Investigo's curriculum today even though the jars are gone.
+    </p>
+    <p class="reveal">
+      The hardest thing to admit: Investigo can make you a more informed investor. It cannot change the environment in which you invest. Social media platforms and brokerage apps are designed to reward emotional reactivity over deliberate analysis. That is a larger design problem this platform alone cannot solve. Worth naming — not as a reason to stop, but as an honest acknowledgment of where the work ends and a harder problem begins.
+    </p>
+  </div>
+</section>
+
+<!-- ── FUTURE ── -->
+<section id="next">
+  <p class="section-label">06 — Future Steps</p>
+  <h2 class="reveal" style="font-size:2.5rem;margin-bottom:.75rem;">Where This Goes Next</h2>
+  <p class="reveal" style="color:var(--text-dim);max-width:580px;margin-bottom:.5rem;">Six priorities — all direct responses to specific findings from testing and production, not a wishlist.</p>
+
+  <div class="future-grid">
+    <div class="future-card reveal">
+      <div class="future-num">01</div>
+      <div class="future-title">Placement Assessment</div>
+      <div class="future-body">20-question onboarding diagnostic. Bypass lessons you already know, still receive the equivalent virtual currency. Directly addresses friction raised by 6 of 12 testers.</div>
+    </div>
+    <div class="future-card reveal">
+      <div class="future-num">02</div>
+      <div class="future-title">Mobile Responsiveness</div>
+      <div class="future-body">Fix what broke. The platform is meant to be accessible on any device. Elements overlapping, buttons off-screen, freezing on phones. Top priority before any public launch.</div>
+    </div>
+    <div class="future-card reveal">
+      <div class="future-num">03</div>
+      <div class="future-title">Real-Time Simulation</div>
+      <div class="future-body">After the historical simulation, apply learning to live market conditions. One-week delayed analytics preserves the reflective structure that historical hindsight currently provides.</div>
+    </div>
+    <div class="future-card reveal">
+      <div class="future-num">04</div>
+      <div class="future-title">Empirical Outcome Study</div>
+      <div class="future-body">Pre/post assessment measuring financial literacy, hype susceptibility, and investment confidence. The central claim needs data, not just argument.</div>
+    </div>
+    <div class="future-card reveal">
+      <div class="future-num">05</div>
+      <div class="future-title">Behavioral Benchmarking</div>
+      <div class="future-body">Cohort comparisons on process metrics — timing discipline, risk management, consistency — not raw returns. Reward decision quality over luck.</div>
+    </div>
+    <div class="future-card reveal">
+      <div class="future-num">06</div>
+      <div class="future-title">Fintech Integration</div>
+      <div class="future-body">Payment infrastructure, subscription tiers, wallet top-ups. AppSumo launch strategy for early adopters. Turn the capstone prototype into a real product.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div>
+    <div class="footer-logo">Investigo</div>
+    <div class="footer-meta">
+      Mohidul Alam &nbsp;·&nbsp; Interactive Media Capstone · NYU · April 2026<br>
+      Advisors: Jack B Du, Aaron Sherwood
+    </div>
+  </div>
+  <div class="footer-links">
+    <a href="https://im-projext.vercel.app" target="_blank">Live Platform ↗</a>
+    <a href="#hero">Back to Top ↑</a>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Stagger grids
+document.querySelectorAll('.prec-grid, .interview-grid, .future-grid, .findings, .screens-grid').forEach(grid => {
+  grid.querySelectorAll('.reveal').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.09) + 's';
+  });
+});
+</script>
+</body>
+</html>

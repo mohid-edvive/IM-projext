@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { InvestigoMark } from "@/components/Logo";
-import { BookOpen, TrendingUp, Home, BarChart3, Shield, GraduationCap, Globe } from "lucide-react";
+import { BookOpen, TrendingUp, Home, BarChart3, Shield, GraduationCap, Globe, Archive } from "lucide-react";
 
 const navLinks = [
   { path: "/",         label: "Home",     icon: Home },
@@ -124,6 +124,25 @@ export default function Footer() {
                   </span>
                 </Link>
               ))}
+              {/* Archive — standalone HTML page */}
+              <a
+                href="/archive.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 transition-colors group"
+                style={{ color: "hsl(var(--paper) / 0.55)" }}
+              >
+                <Archive
+                  className="h-3 w-3 shrink-0"
+                  style={{ color: "hsl(var(--paper) / 0.35)" }}
+                />
+                <span
+                  className="font-mono uppercase tracking-[0.12em] group-hover:text-[hsl(var(--paper))] transition-colors"
+                  style={{ fontSize: 10 }}
+                >
+                  Archive
+                </span>
+              </a>
             </nav>
           </div>
 

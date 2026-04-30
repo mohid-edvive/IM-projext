@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useGameStore } from "@/store/gameStore";
 import { getPriceAtDate } from "@/data/priceData";
-import { BookOpen, TrendingUp, Home, BarChart3 } from "lucide-react";
+import { BookOpen, TrendingUp, Home, BarChart3, Archive } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { InvestigoMark, InvestigoWordmark } from "@/components/Logo";
 
@@ -72,6 +72,11 @@ export default function Header() {
                 </Link>
               );
             })}
+            <a href="/archive.html" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3.5 py-2 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted/50">
+              <Archive className="h-3 w-3" />
+              Archive
+            </a>
           </nav>
 
           {/* balances */}
