@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 // ── Brand tokens (light / paper theme) ────────────────────────────────────────
@@ -51,84 +51,7 @@ function Tags({ items }: { items: Array<{ label: string; variant?: "amber" | "in
 }
 
 // ── Embed Modal ───────────────────────────────────────────────────────────────
-function EmbedModal({ href, label, onClose }: { href: string; label: string; onClose: () => void }) {
-  const [blocked, setBlocked] = useState(false);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [onClose]);
-
-  // Detect X-Frame-Options block via load timeout
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      try {
-        // If contentDocument is null the frame was blocked
-        if (iframeRef.current && !iframeRef.current.contentDocument) setBlocked(true);
-      } catch { setBlocked(true); }
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const hostname = (() => { try { return new URL(href).hostname; } catch { return href; } })();
-
-  return (
-    <div
-      onClick={onClose}
-      style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(26,40,32,.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{ width: "100%", maxWidth: 1100, background: T.cream, borderRadius: 10, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,.35)", display: "flex", flexDirection: "column", maxHeight: "90vh" }}
-      >
-        {/* Modal header */}
-        <div style={{ display: "flex", alignItems: "center", gap: ".75rem", padding: ".75rem 1rem", borderBottom: `1px solid ${T.border}`, background: T.paper2, flexShrink: 0 }}>
-          {/* Traffic lights */}
-          <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={onClose} style={{ width: 12, height: 12, borderRadius: "50%", background: "#ff5f57", border: "none", cursor: "pointer" }} title="Close" />
-            <div style={{ width: 12, height: 12, borderRadius: "50%", background: T.paper3 }} />
-            <div style={{ width: 12, height: 12, borderRadius: "50%", background: T.paper3 }} />
-          </div>
-          {/* URL bar */}
-          <div style={{ flex: 1, display: "flex", alignItems: "center", gap: ".5rem", background: T.cream, border: `1px solid ${T.border}`, borderRadius: 5, padding: ".3rem .75rem" }}>
-            <img src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`} alt="" width={13} height={13} style={{ borderRadius: 2 }} />
-            <span style={{ ...mono, fontSize: ".72rem", color: T.textDim, letterSpacing: ".03em" }}>{href}</span>
-          </div>
-          <a href={href} target="_blank" rel="noopener noreferrer"
-            style={{ ...mono, fontSize: ".68rem", letterSpacing: ".08em", textTransform: "uppercase", color: T.amber, textDecoration: "none", padding: ".3rem .75rem", border: `1px solid rgba(200,133,44,.35)`, borderRadius: 4, flexShrink: 0 }}>
-            Open ↗
-          </a>
-        </div>
-
-        {/* iframe / blocked state */}
-        <div style={{ flex: 1, position: "relative", minHeight: 480 }}>
-          {blocked ? (
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1.25rem", background: T.paper }}>
-              <img src={`https://image.thum.io/get/width/1100/crop/620/noanimate/${href}`} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", opacity: .6 }} />
-              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
-                <p style={{ ...mono, fontSize: ".75rem", color: T.textDim, letterSpacing: ".08em" }}>This site blocks embedding — screenshot shown.</p>
-                <a href={href} target="_blank" rel="noopener noreferrer"
-                  style={{ ...mono, fontSize: ".72rem", letterSpacing: ".1em", textTransform: "uppercase", padding: ".65rem 1.5rem", background: T.ink, color: T.paper, borderRadius: 4, textDecoration: "none" }}>
-                  View Full Site ↗
-                </a>
-              </div>
-            </div>
-          ) : (
-            <iframe
-              ref={iframeRef}
-              src={href}
-              title={label}
-              style={{ width: "100%", height: "100%", border: "none", minHeight: 520 }}
-              onError={() => setBlocked(true)}
-            />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+// EmbedModal kept for backward compatibility but not used
 
 // ── Section wrapper helpers ───────────────────────────────────────────────────
 const W = { maxWidth: 1080, margin: "0 auto", padding: "0 3rem" };
@@ -272,14 +195,9 @@ const TIMELINE_ITEMS = [
 function TimelineCard({ item, index }: { item: typeof TIMELINE_ITEMS[number]; index: number }) {
   const phaseNum = String(index + 1).padStart(2, "0");
   const isMilestone = item.tags.some(t => t.variant === "ink");
-  const [embedOpen, setEmbedOpen] = useState(false);
   const hostname = item.link ? (() => { try { return new URL(item.link.href).hostname; } catch { return ""; } })() : "";
 
   return (
-    <>
-      {embedOpen && item.link && (
-        <EmbedModal href={item.link.href} label={item.link.label} onClose={() => setEmbedOpen(false)} />
-      )}
       <div style={{
         position: "relative",
         background: T.paper,
@@ -322,45 +240,56 @@ function TimelineCard({ item, index }: { item: typeof TIMELINE_ITEMS[number]; in
         {/* Tags */}
         <Tags items={item.tags} />
 
-        {/* Embed link button */}
+        {/* Prototype link card */}
         {item.link && (
-          <button
-            onClick={() => setEmbedOpen(true)}
-            style={{
+          <a
+            href={item.link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "block", marginTop: "1.5rem", textDecoration: "none" }}
+          >
+            <div style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              width: "100%",
-              marginTop: "1.25rem",
-              padding: ".75rem 1rem",
-              background: T.cream,
-              border: `1px solid ${T.border}`,
-              borderRadius: 4,
-              cursor: "pointer",
-              transition: "background .15s, border-color .15s",
-              textAlign: "left",
+              gap: "1rem",
+              padding: "1rem 1.1rem",
+              background: T.ink,
+              borderRadius: 8,
+              transition: "transform .15s, box-shadow .15s",
             }}
-            onMouseEnter={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = T.paper2; el.style.borderColor = T.amber; }}
-            onMouseLeave={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = T.cream; el.style.borderColor = T.border; }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: ".6rem", minWidth: 0 }}>
-              <img
-                src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`}
-                alt="" width={14} height={14}
-                style={{ borderRadius: 2, flexShrink: 0 }}
-                onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-              />
-              <span style={{ ...mono, fontSize: ".7rem", color: T.textDim, letterSpacing: ".04em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {item.link.label}
-              </span>
+              onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-1px)"; el.style.boxShadow = `0 6px 24px rgba(0,0,0,.25), 0 0 0 1px ${T.amber}`; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = ""; el.style.boxShadow = ""; }}
+            >
+              {/* Left: favicon + label */}
+              <div style={{ display: "flex", alignItems: "center", gap: ".85rem", minWidth: 0 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 7, background: "rgba(200,133,44,.12)", border: "1px solid rgba(200,133,44,.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
+                    alt="" width={15} height={15}
+                    style={{ borderRadius: 2 }}
+                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                  />
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ ...mono, fontSize: ".58rem", color: "rgba(245,240,232,.3)", letterSpacing: ".1em", textTransform: "uppercase" as const, marginBottom: ".2rem" }}>
+                    Live prototype
+                  </div>
+                  <div style={{ ...mono, fontSize: ".73rem", color: "rgba(245,240,232,.75)", letterSpacing: ".02em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
+                    {item.link.label}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: CTA pill */}
+              <div style={{ display: "flex", alignItems: "center", gap: ".5rem", flexShrink: 0, padding: ".42rem .9rem", background: T.amber, borderRadius: 5 }}>
+                <span style={{ ...mono, fontSize: ".67rem", color: T.ink, letterSpacing: ".1em", fontWeight: 700 }}>Open</span>
+                <span style={{ fontSize: ".8rem", color: T.ink, lineHeight: 1 }}>↗</span>
+              </div>
             </div>
-            <span style={{ ...mono, fontSize: ".68rem", color: T.amber, flexShrink: 0, marginLeft: ".5rem", letterSpacing: ".06em" }}>
-              View →
-            </span>
-          </button>
+          </a>
         )}
       </div>
-    </>
   );
 }
 
