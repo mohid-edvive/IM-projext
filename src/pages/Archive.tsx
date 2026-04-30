@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 
 // ── Brand tokens (light / paper theme) ────────────────────────────────────────
@@ -46,6 +46,86 @@ function Tags({ items }: { items: Array<{ label: string; variant?: "amber" | "in
   return (
     <div style={{ display: "flex", flexWrap: "wrap" as const, gap: ".5rem", marginTop: ".75rem" }}>
       {items.map(t => <Tag key={t.label} variant={t.variant}>{t.label}</Tag>)}
+    </div>
+  );
+}
+
+// ── Embed Modal ───────────────────────────────────────────────────────────────
+function EmbedModal({ href, label, onClose }: { href: string; label: string; onClose: () => void }) {
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  // Detect X-Frame-Options block via load timeout
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        // If contentDocument is null the frame was blocked
+        if (iframeRef.current && !iframeRef.current.contentDocument) setBlocked(true);
+      } catch { setBlocked(true); }
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const hostname = (() => { try { return new URL(href).hostname; } catch { return href; } })();
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(26,40,32,.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ width: "100%", maxWidth: 1100, background: T.cream, borderRadius: 10, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,.35)", display: "flex", flexDirection: "column", maxHeight: "90vh" }}
+      >
+        {/* Modal header */}
+        <div style={{ display: "flex", alignItems: "center", gap: ".75rem", padding: ".75rem 1rem", borderBottom: `1px solid ${T.border}`, background: T.paper2, flexShrink: 0 }}>
+          {/* Traffic lights */}
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={onClose} style={{ width: 12, height: 12, borderRadius: "50%", background: "#ff5f57", border: "none", cursor: "pointer" }} title="Close" />
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: T.paper3 }} />
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: T.paper3 }} />
+          </div>
+          {/* URL bar */}
+          <div style={{ flex: 1, display: "flex", alignItems: "center", gap: ".5rem", background: T.cream, border: `1px solid ${T.border}`, borderRadius: 5, padding: ".3rem .75rem" }}>
+            <img src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`} alt="" width={13} height={13} style={{ borderRadius: 2 }} />
+            <span style={{ ...mono, fontSize: ".72rem", color: T.textDim, letterSpacing: ".03em" }}>{href}</span>
+          </div>
+          <a href={href} target="_blank" rel="noopener noreferrer"
+            style={{ ...mono, fontSize: ".68rem", letterSpacing: ".08em", textTransform: "uppercase", color: T.amber, textDecoration: "none", padding: ".3rem .75rem", border: `1px solid rgba(200,133,44,.35)`, borderRadius: 4, flexShrink: 0 }}>
+            Open ↗
+          </a>
+        </div>
+
+        {/* iframe / blocked state */}
+        <div style={{ flex: 1, position: "relative", minHeight: 480 }}>
+          {blocked ? (
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1.25rem", background: T.paper }}>
+              <img src={`https://image.thum.io/get/width/1100/crop/620/noanimate/${href}`} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", opacity: .6 }} />
+              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
+                <p style={{ ...mono, fontSize: ".75rem", color: T.textDim, letterSpacing: ".08em" }}>This site blocks embedding — screenshot shown.</p>
+                <a href={href} target="_blank" rel="noopener noreferrer"
+                  style={{ ...mono, fontSize: ".72rem", letterSpacing: ".1em", textTransform: "uppercase", padding: ".65rem 1.5rem", background: T.ink, color: T.paper, borderRadius: 4, textDecoration: "none" }}>
+                  View Full Site ↗
+                </a>
+              </div>
+            </div>
+          ) : (
+            <iframe
+              ref={iframeRef}
+              src={href}
+              title={label}
+              style={{ width: "100%", height: "100%", border: "none", minHeight: 520 }}
+              onError={() => setBlocked(true)}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -149,87 +229,95 @@ const TIMELINE_ITEMS = [
 function TimelineCard({ item, index }: { item: typeof TIMELINE_ITEMS[number]; index: number }) {
   const phaseNum = String(index + 1).padStart(2, "0");
   const isMilestone = item.tags.some(t => t.variant === "ink");
-  return (
-    <div style={{
-      position: "relative",
-      background: T.paper,
-      border: `1px solid ${isMilestone ? T.amber : T.border}`,
-      borderRadius: 8,
-      padding: "2rem",
-      overflow: "hidden",
-      transition: "box-shadow .2s, transform .2s",
-    }}
-      onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-2px)"; el.style.boxShadow = "0 8px 32px rgba(26,40,32,.1)"; }}
-      onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = ""; el.style.boxShadow = ""; }}
-    >
-      {/* Large watermark phase number */}
-      <div style={{ position: "absolute", top: -8, right: 16, ...serif, fontSize: "7rem", fontWeight: 700, color: T.border, lineHeight: 1, pointerEvents: "none", userSelect: "none" }}>
-        {phaseNum}
-      </div>
+  const [embedOpen, setEmbedOpen] = useState(false);
+  const hostname = item.link ? (() => { try { return new URL(item.link.href).hostname; } catch { return ""; } })() : "";
 
-      {/* Top row: phase label + milestone badge */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: ".75rem" }}>
-        <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".18em", textTransform: "uppercase", color: T.amber }}>
-          {item.phase}
-        </span>
-        {isMilestone && (
-          <span style={{ ...mono, fontSize: ".6rem", letterSpacing: ".1em", textTransform: "uppercase", padding: ".2rem .6rem", background: T.ink, color: T.paper, borderRadius: 3 }}>
-            Milestone
+  return (
+    <>
+      {embedOpen && item.link && (
+        <EmbedModal href={item.link.href} label={item.link.label} onClose={() => setEmbedOpen(false)} />
+      )}
+      <div style={{
+        position: "relative",
+        background: T.paper,
+        border: `1px solid ${isMilestone ? T.amber : T.border}`,
+        borderRadius: 8,
+        padding: "2rem",
+        overflow: "hidden",
+        transition: "box-shadow .2s, transform .2s",
+      }}
+        onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-2px)"; el.style.boxShadow = "0 8px 32px rgba(26,40,32,.1)"; }}
+        onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.transform = ""; el.style.boxShadow = ""; }}
+      >
+        {/* Large watermark phase number */}
+        <div style={{ position: "absolute", top: -8, right: 16, ...serif, fontSize: "7rem", fontWeight: 700, color: T.border, lineHeight: 1, pointerEvents: "none", userSelect: "none" }}>
+          {phaseNum}
+        </div>
+
+        {/* Top row: phase label + milestone badge */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: ".75rem" }}>
+          <span style={{ ...mono, fontSize: ".65rem", letterSpacing: ".18em", textTransform: "uppercase", color: T.amber }}>
+            {item.phase}
           </span>
+          {isMilestone && (
+            <span style={{ ...mono, fontSize: ".6rem", letterSpacing: ".1em", textTransform: "uppercase", padding: ".2rem .6rem", background: T.ink, color: T.paper, borderRadius: 3 }}>
+              Milestone
+            </span>
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 style={{ ...serif, fontSize: "1.35rem", marginBottom: ".75rem", color: T.ink, lineHeight: 1.2, maxWidth: "85%" }}>
+          {item.title}
+        </h3>
+
+        {/* Body */}
+        <p style={{ ...body, color: T.textDim, fontSize: ".9rem", lineHeight: 1.7, marginBottom: "1.25rem" }}>
+          {item.body}
+        </p>
+
+        {/* Tags */}
+        <Tags items={item.tags} />
+
+        {/* Embed link button */}
+        {item.link && (
+          <button
+            onClick={() => setEmbedOpen(true)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              marginTop: "1.25rem",
+              padding: ".75rem 1rem",
+              background: T.cream,
+              border: `1px solid ${T.border}`,
+              borderRadius: 4,
+              cursor: "pointer",
+              transition: "background .15s, border-color .15s",
+              textAlign: "left",
+            }}
+            onMouseEnter={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = T.paper2; el.style.borderColor = T.amber; }}
+            onMouseLeave={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = T.cream; el.style.borderColor = T.border; }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: ".6rem", minWidth: 0 }}>
+              <img
+                src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`}
+                alt="" width={14} height={14}
+                style={{ borderRadius: 2, flexShrink: 0 }}
+                onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+              />
+              <span style={{ ...mono, fontSize: ".7rem", color: T.textDim, letterSpacing: ".04em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {item.link.label}
+              </span>
+            </div>
+            <span style={{ ...mono, fontSize: ".68rem", color: T.amber, flexShrink: 0, marginLeft: ".5rem", letterSpacing: ".06em" }}>
+              View →
+            </span>
+          </button>
         )}
       </div>
-
-      {/* Title */}
-      <h3 style={{ ...serif, fontSize: "1.35rem", marginBottom: ".75rem", color: T.ink, lineHeight: 1.2, maxWidth: "85%" }}>
-        {item.title}
-      </h3>
-
-      {/* Body */}
-      <p style={{ ...body, color: T.textDim, fontSize: ".9rem", lineHeight: 1.7, marginBottom: "1.25rem" }}>
-        {item.body}
-      </p>
-
-      {/* Tags */}
-      <Tags items={item.tags} />
-
-      {/* Link button */}
-      {item.link && (
-        <a
-          href={item.link.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginTop: "1.25rem",
-            padding: ".75rem 1rem",
-            background: T.cream,
-            border: `1px solid ${T.border}`,
-            borderRadius: 4,
-            textDecoration: "none",
-            transition: "background .15s, border-color .15s",
-          }}
-          onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = T.paper2; el.style.borderColor = T.amber; }}
-          onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = T.cream; el.style.borderColor = T.border; }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: ".6rem", minWidth: 0 }}>
-            {/* Favicon */}
-            <img
-              src={`https://www.google.com/s2/favicons?domain=${new URL(item.link.href).hostname}&sz=32`}
-              alt=""
-              width={14} height={14}
-              style={{ borderRadius: 2, flexShrink: 0 }}
-              onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-            />
-            <span style={{ ...mono, fontSize: ".7rem", color: T.textDim, letterSpacing: ".04em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {item.link.label}
-            </span>
-          </div>
-          <span style={{ ...mono, fontSize: ".75rem", color: T.amber, flexShrink: 0, marginLeft: ".5rem" }}>↗</span>
-        </a>
-      )}
-    </div>
+    </>
   );
 }
 
