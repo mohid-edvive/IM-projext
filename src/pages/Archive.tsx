@@ -484,42 +484,120 @@ const EARN_ROWS = [
   { lessons: "Total", topic: "All 50 lessons, perfect scores", reward: "~$15,000", assets: "130+ assets", bold: true },
 ];
 
+const SYSTEMS = [
+  { icon: "📚", label: "Learn", stat: "50 lessons", desc: "5 thematic units, flashcards, quizzes, earn-to-invest rewards" },
+  { icon: "📈", label: "Trade", stat: "130+ assets", desc: "Historical simulator Jan 2020–Dec 2026, real-time clock, annotated events" },
+  { icon: "📊", label: "Analysis", stat: "8 metrics", desc: "Investor type, behavioral radar, timing scores, personalized insight cards" },
+  { icon: "📰", label: "News", stat: "Live feed", desc: "GDELT 2.0 API — real market news contextualised for each in-game month" },
+];
+
+const FLOW_STEPS = [
+  { n: "01", label: "Complete a Lesson", sub: "Read, flashcard, or quiz format" },
+  { n: "02", label: "Pass the Quiz", sub: "Score above threshold to earn" },
+  { n: "03", label: "Earn Virtual Capital", sub: "$100 – $600 per lesson" },
+  { n: "04", label: "Unlock Assets", sub: "Gates open as knowledge grows" },
+  { n: "05", label: "Enter the Simulator", sub: "Trade with your earned capital" },
+];
+
 function Platform() {
   return (
     <section id="platform" style={{ padding: "7rem 0", borderBottom: `1px solid ${T.border}` }}>
       <SectionLabel n="03" label="Platform" />
-      <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: ".75rem", color: T.ink }}>What Was Built</h2>
-      <p style={{ ...body, color: T.textDim, maxWidth: 680, marginBottom: "1rem" }}>
-        The final platform — <strong>Investigo</strong> — brings together four interconnected systems built over February–April 2026.
-      </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "1.5rem", marginTop: "2.5rem" }}>
-        {SCREEN_ITEMS.map(s => <ScreenCard key={s.title} s={s} />)}
+      {/* Header row */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "2rem", alignItems: "end", marginBottom: "3rem" }}>
+        <div>
+          <h2 style={{ ...serif, fontSize: "2.5rem", marginBottom: ".75rem", color: T.ink }}>What Was Built</h2>
+          <p style={{ ...body, color: T.textDim, maxWidth: 600 }}>
+            The final platform brings together four interconnected systems — curriculum, simulator, analytics, and live news — built over February–April 2026.
+          </p>
+        </div>
+        <a href="https://im-projext.vercel.app" target="_blank" rel="noopener noreferrer"
+          style={{ display: "inline-flex", alignItems: "center", gap: ".5rem", padding: ".7rem 1.4rem", background: T.ink, color: T.paper, ...mono, fontSize: ".72rem", letterSpacing: ".1em", textTransform: "uppercase", borderRadius: 4, textDecoration: "none", flexShrink: 0 }}>
+          View Live ↗
+        </a>
       </div>
 
+      {/* Four systems strip */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: T.border, border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden", marginBottom: "3.5rem" }}>
+        {SYSTEMS.map(s => (
+          <div key={s.label} style={{ background: T.paper, padding: "1.75rem 1.5rem" }}>
+            <div style={{ fontSize: "1.6rem", marginBottom: ".6rem" }}>{s.icon}</div>
+            <div style={{ ...mono, fontSize: ".62rem", letterSpacing: ".15em", textTransform: "uppercase", color: T.amber, marginBottom: ".25rem" }}>{s.label}</div>
+            <div style={{ ...serif, fontSize: "1.5rem", color: T.ink, marginBottom: ".5rem", lineHeight: 1 }}>{s.stat}</div>
+            <div style={{ ...body, fontSize: ".8rem", color: T.textDim, lineHeight: 1.55 }}>{s.desc}</div>
+          </div>
+        ))}
+      </div>
 
-      {/* Earn-to-invest table */}
-      <h3 style={{ ...serif, fontSize: "1.5rem", margin: "4rem 0 .5rem", color: T.ink }}>Earn-to-Invest Reward Structure</h3>
-      <p style={{ ...body, color: T.textDim, fontSize: ".9rem", maxWidth: 560, marginBottom: ".5rem" }}>You start with zero capital. Every quiz pass earns virtual currency. That currency is the only way to fund trades.</p>
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "2rem", fontSize: ".875rem" }}>
-        <thead>
-          <tr>
-            {["Lessons","Topic Area","Reward (Perfect)","Assets Unlocked"].map(h => (
-              <th key={h} style={{ background: T.paper2, color: T.textFaint, ...mono, fontSize: ".68rem", letterSpacing: ".08em", textTransform: "uppercase", padding: ".75rem 1rem", textAlign: "left", borderBottom: `1px solid ${T.border}`, fontWeight: 400 }}>{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {EARN_ROWS.map(r => (
-            <tr key={r.lessons}>
-              <td style={{ padding: ".75rem 1rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.05)`, ...mono, color: T.amber, fontWeight: r.bold ? 500 : 400 }}>{r.lessons}</td>
-              <td style={{ padding: ".75rem 1rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.05)`, color: r.bold ? T.ink : T.textDim, ...body, fontSize: ".875rem", fontWeight: r.bold ? 500 : 400 }}>{r.topic}</td>
-              <td style={{ padding: ".75rem 1rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.05)`, ...mono, color: T.gain, fontWeight: r.bold ? 500 : 400 }}>{r.reward}</td>
-              <td style={{ padding: ".75rem 1rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.05)`, color: r.bold ? T.ink : T.textDim, ...body, fontSize: ".875rem", fontWeight: r.bold ? 500 : 400 }}>{r.assets}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Featured large screenshot (home) */}
+      <div style={{ border: `1px solid ${T.border}`, borderRadius: 10, overflow: "hidden", marginBottom: "1.25rem", position: "relative" }}>
+        <ScreenCard s={SCREEN_ITEMS[0]} />
+      </div>
+
+      {/* 3 smaller screenshots */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.25rem", marginBottom: "4.5rem" }}>
+        {SCREEN_ITEMS.slice(1).map(s => <ScreenCard key={s.title} s={s} />)}
+      </div>
+
+      {/* Earn-to-invest — flow + table */}
+      <div style={{ background: T.paper, border: `1px solid ${T.border}`, borderRadius: 10, padding: "2.5rem", marginBottom: "1rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "start" }}>
+
+          {/* Left: flow steps */}
+          <div>
+            <h3 style={{ ...serif, fontSize: "1.4rem", marginBottom: ".4rem", color: T.ink }}>Earn-to-Invest Mechanic</h3>
+            <p style={{ ...body, color: T.textDim, fontSize: ".85rem", marginBottom: "1.75rem" }}>
+              You start with zero. Every quiz pass converts knowledge into tradeable capital.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              {FLOW_STEPS.map((step, i) => (
+                <div key={step.n} style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: i === FLOW_STEPS.length - 1 ? T.ink : "rgba(200,133,44,.15)", border: `1.5px solid ${i === FLOW_STEPS.length - 1 ? T.ink : T.amber}`, display: "flex", alignItems: "center", justifyContent: "center", ...mono, fontSize: ".6rem", color: i === FLOW_STEPS.length - 1 ? T.paper : T.amber }}>
+                      {step.n}
+                    </div>
+                    {i < FLOW_STEPS.length - 1 && <div style={{ width: 1, height: 28, background: `linear-gradient(to bottom, ${T.amber}, ${T.border})`, margin: "2px 0" }} />}
+                  </div>
+                  <div style={{ paddingBottom: i < FLOW_STEPS.length - 1 ? "1rem" : 0 }}>
+                    <div style={{ ...serif, fontSize: ".95rem", color: T.ink, marginBottom: ".15rem" }}>{step.label}</div>
+                    <div style={{ ...mono, fontSize: ".65rem", color: T.textFaint, letterSpacing: ".04em" }}>{step.sub}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: reward table */}
+          <div>
+            <h3 style={{ ...serif, fontSize: "1.4rem", marginBottom: "1.25rem", color: T.ink }}>Reward Structure</h3>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: ".82rem" }}>
+              <thead>
+                <tr>
+                  {["Unit","Topic","Reward","Unlocks"].map(h => (
+                    <th key={h} style={{ ...mono, fontSize: ".62rem", letterSpacing: ".08em", textTransform: "uppercase", color: T.textFaint, padding: ".6rem .75rem", textAlign: "left", borderBottom: `1px solid ${T.border}`, fontWeight: 400 }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {EARN_ROWS.map((r, i) => (
+                  <tr key={r.lessons} style={{ background: i % 2 === 0 ? "transparent" : "rgba(26,40,32,.02)" }}>
+                    <td style={{ padding: ".6rem .75rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.04)`, ...mono, color: T.amber, fontWeight: r.bold ? 600 : 400, fontSize: r.bold ? ".8rem" : ".75rem" }}>{r.lessons}</td>
+                    <td style={{ padding: ".6rem .75rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.04)`, color: r.bold ? T.ink : T.textDim, ...body, fontWeight: r.bold ? 600 : 400 }}>{r.topic}</td>
+                    <td style={{ padding: ".6rem .75rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.04)`, ...mono, color: T.gain, fontWeight: r.bold ? 600 : 400, fontSize: ".78rem" }}>{r.reward}</td>
+                    <td style={{ padding: ".6rem .75rem", borderBottom: r.bold ? "none" : `1px solid rgba(26,40,32,.04)`, color: r.bold ? T.ink : T.textDim, ...body, fontSize: ".78rem" }}>{r.assets}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {/* Total callout */}
+            <div style={{ marginTop: "1rem", padding: ".75rem 1rem", background: "rgba(200,133,44,.08)", border: `1px solid rgba(200,133,44,.2)`, borderRadius: 5, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ ...body, fontSize: ".85rem", color: T.textDim }}>Max capital (all 50 lessons, perfect scores)</span>
+              <span style={{ ...serif, fontSize: "1.35rem", color: T.amber }}>~$15,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
