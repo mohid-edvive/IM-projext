@@ -324,25 +324,6 @@ function Platform() {
         {SCREEN_ITEMS.map(s => <ScreenCard key={s.title} s={s} />)}
       </div>
 
-      {/* Design system swatches */}
-      <h3 style={{ ...serif, fontSize: "1.5rem", margin: "4rem 0 .5rem", color: T.ink }}>Design System — Deep Space Finance</h3>
-      <p style={{ ...body, color: T.textDim, fontSize: ".9rem", maxWidth: 560, marginBottom: ".5rem" }}>Every color token carries a specific meaning consistent throughout every screen.</p>
-      <div style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap" as const, marginTop: "1.75rem" }}>
-        {[
-          { hex: "#00C2FF", name: "Cyan",       role: "Action" },
-          { hex: "#00E5A0", name: "Emerald",    role: "Profit" },
-          { hex: "#FFB800", name: "Amber",      role: "Rewards" },
-          { hex: "#FF3B5C", name: "Crimson",    role: "Loss" },
-          { hex: "#A78BFA", name: "Violet",     role: "Education" },
-          { hex: "#0A1228", name: "Navy Deep",  role: "Background" },
-        ].map(s => (
-          <div key={s.name} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: ".5rem" }}>
-            <div style={{ width: 52, height: 52, borderRadius: 8, background: s.hex, border: "1px solid rgba(0,0,0,.08)" }} />
-            <span style={{ ...mono, fontSize: ".65rem", color: T.textDim }}>{s.name}</span>
-            <span style={{ ...mono, fontSize: ".6rem", color: T.textFaint }}>{s.hex} · {s.role}</span>
-          </div>
-        ))}
-      </div>
 
       {/* Earn-to-invest table */}
       <h3 style={{ ...serif, fontSize: "1.5rem", margin: "4rem 0 .5rem", color: T.ink }}>Earn-to-Invest Reward Structure</h3>
