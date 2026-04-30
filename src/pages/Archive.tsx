@@ -441,23 +441,16 @@ const SCREEN_ITEMS = [
 ];
 
 function ScreenCard({ s }: { s: typeof SCREEN_ITEMS[number] }) {
-  const [loaded, setLoaded] = useState(false);
   const content = (
     <div style={{ border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden", background: T.paper, transition: "transform .2s, box-shadow .2s", cursor: "pointer" }}
       onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-3px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 30px rgba(26,40,32,.12)"; }}
       onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ""; (e.currentTarget as HTMLDivElement).style.boxShadow = ""; }}>
       {/* Screenshot */}
       <div style={{ width: "100%", aspectRatio: "16/9", background: "#1a2820", position: "relative", overflow: "hidden" }}>
-        {!loaded && (
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ ...mono, fontSize: ".65rem", color: "rgba(245,240,232,.3)", letterSpacing: ".1em" }}>Loading screenshot…</span>
-          </div>
-        )}
         <img
           src={s.img}
           alt={s.title}
-          onLoad={() => setLoaded(true)}
-          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: loaded ? "block" : "none" }}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
         />
         {/* Overlay badge */}
         <div style={{ position: "absolute", top: 10, right: 10, ...mono, fontSize: ".62rem", letterSpacing: ".08em", textTransform: "uppercase", padding: ".25rem .6rem", background: "rgba(26,40,32,.75)", color: "rgba(245,240,232,.7)", backdropFilter: "blur(6px)", borderRadius: 3 }}>
